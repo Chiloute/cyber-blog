@@ -1,0 +1,50 @@
+---
+title: "Linux Privilege Escalation Cheatsheet"
+description: "A short, practical checklist of common Linux privilege escalation checks, for use on CTF boxes and personal lab VMs only."
+date: 2026-09-01
+tags: [linux, privesc, cheatsheet]
+---
+
+import { Callout } from '../../components/mdx';
+
+<Callout type="warning" title="Scope">
+Only run these checks on CTF boxes, personal lab VMs, or systems you are explicitly authorised to test. This note does not target any real, named system.
+</Callout>
+
+## Quick enumeration
+
+A few commands worth running early on any box you have a shell on:
+
+```bash
+id
+sudo -l
+uname -a
+cat /etc/os-release
+```
+
+## SUID and capabilities
+
+Binaries with the SUID bit set, or extra Linux capabilities, are a frequent path to a higher-privileged shell:
+
+```bash
+find / -perm -4000 -type f 2>/dev/null
+getcap -r / 2>/dev/null
+```
+
+## Cron jobs and writable paths
+
+Worth checking whether a privileged cron job runs a script you can edit, or whether `$PATH` includes a writable directory before the expected one:
+
+```bash
+cat /etc/crontab
+ls -la /etc/cron.d/
+echo $PATH
+```
+
+## Kernel and package versions
+
+Outdated kernels or packages sometimes map to known, public escalation issues; cross-check versions against vulnerability databases before trying any exploit.
+
+<Callout type="tip" title="Keep a local copy">
+Save `uname -a` and `/etc/os-release` output locally before trying anything destructive, so you can restore context if a lab snapshot needs resetting.
+</Callout>
