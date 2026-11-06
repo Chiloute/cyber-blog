@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import ContactEmail from '../components/ContactEmail.astro';
+import PageHeader from '../components/PageHeader.astro';
 import { cv, certifications, ctfProfiles, socialLinks } from '../config/site.ts';
 
 const certs = certifications.filter((c) => c.enabled);
@@ -9,41 +10,42 @@ const ctf = ctfProfiles.filter((c) => c.enabled);
 const skills = ['Web application security', 'Reverse engineering', 'Binary exploitation', 'Cryptography', 'Digital forensics', 'Linux and scripting (Python, Bash)'];
 ---
 <BaseLayout title="About" description="About chiloute: background, skills, certifications and CTF profiles." breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'About', path: '/about/' }]}>
-  <h1 class="text-3xl font-bold"><span aria-hidden="true" class="font-mono text-muted">$ whoami<br /></span>About</h1>
   {/* TODO: write the real bio (pseudonym only, no real name) */}
-  <p class="mt-4 max-w-prose">I am chiloute, a security enthusiast who learns by breaking things in controlled environments and writing down what worked.</p>
-  <p class="mt-4 max-w-prose">This blog collects my CTF writeups, short notes and the small projects I build along the way.</p>
+  <PageHeader kicker="$ whoami" title="About" lead="I am chiloute, a security enthusiast who learns by breaking things in controlled environments and writing down what worked." />
+  <div class="prose mt-8">
+  <p>This blog collects my CTF writeups, short notes and the small projects I build along the way.</p>
 
-  <h2 class="mt-10 text-2xl font-bold">Skills</h2>
-  <ul class="mt-4 list-disc pl-6">{skills.map((s) => <li>{s}</li>)}</ul>
+  <h2>Skills</h2>
+  <ul>{skills.map((s) => <li>{s}</li>)}</ul>
 
-  <h2 class="mt-10 text-2xl font-bold">Certifications</h2>
-  {certs.length === 0 ? <p class="mt-4">Certifications will be listed here.</p> : (
-    <ul class="mt-4 list-disc pl-6">
+  <h2>Certifications</h2>
+  {certs.length === 0 ? <p>Certifications will be listed here.</p> : (
+    <ul>
       {certs.map((c) => (
-        <li>{c.name}, {c.issuer}, {c.year}. <ExternalLink href={c.verifyUrl} newTab class="text-accent underline">Verify {c.name} on {c.issuer}</ExternalLink></li>
+        <li>{c.name}, {c.issuer}, {c.year}. <ExternalLink href={c.verifyUrl} newTab>Verify {c.name} on {c.issuer}</ExternalLink></li>
       ))}
     </ul>
   )}
 
-  <h2 class="mt-10 text-2xl font-bold">CV</h2>
+  <h2>CV</h2>
   {cv.path ? (
-    <p class="mt-4"><a href={cv.path} download class="text-accent underline">Download CV (PDF)</a> <span class="text-sm text-muted">(PDF{/* TODO: add file size, e.g. ", 120 KB" */})</span></p>
+    <p><a href={cv.path} download>Download CV (PDF)</a> <span class="text-sm text-muted">(PDF{/* TODO: add file size, e.g. ", 120 KB" */})</span></p>
   ) : (
-    <p class="mt-4">CV available on request: <ContactEmail /></p>
+    <p>CV available on request: <ContactEmail /></p>
   )}
 
   {ctf.length > 0 && (
     <>
-      <h2 class="mt-10 text-2xl font-bold">CTF profiles</h2>
-      <ul class="mt-4 list-disc pl-6">
-        {ctf.map((c) => <li><ExternalLink href={c.url} newTab class="text-accent underline">{c.name}</ExternalLink></li>)}
+      <h2>CTF profiles</h2>
+      <ul>
+        {ctf.map((c) => <li><ExternalLink href={c.url} newTab>{c.name}</ExternalLink></li>)}
       </ul>
     </>
   )}
 
-  <h2 class="mt-10 text-2xl font-bold">Elsewhere</h2>
-  <ul class="mt-4 list-disc pl-6">
-    {socialLinks.map((l) => <li><ExternalLink href={l.url} newTab class="text-accent underline">{l.name}</ExternalLink></li>)}
+  <h2>Elsewhere</h2>
+  <ul>
+    {socialLinks.map((l) => <li><ExternalLink href={l.url} newTab>{l.name}</ExternalLink></li>)}
   </ul>
+  </div>
 </BaseLayout>

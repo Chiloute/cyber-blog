@@ -53,11 +53,15 @@ async function run(q: string, immediate: boolean) {
       const a = document.createElement('a');
       a.href = d.url;
       a.textContent = d.meta.title || d.url;
+      a.className = 'font-semibold';
       const h = document.createElement('h2');
+      h.className = 'm-0 text-lg';
       h.append(a);
       const p = document.createElement('p');
+      p.className = 'm-0 mt-1 text-[0.9375rem] text-muted';
       p.append(...excerptNodes(d.excerpt));
       const art = document.createElement('article');
+      art.className = 'py-4';
       art.append(h, p);
       const li = document.createElement('li');
       li.append(art);

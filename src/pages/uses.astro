@@ -1,47 +1,50 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
 ---
 <BaseLayout title="Uses" description="Hardware, software and security tooling I use day to day." breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Uses', path: '/uses/' }]}>
-  <h1 class="text-3xl font-bold"><span aria-hidden="true" class="font-mono text-muted">$ cat uses.txt<br /></span>Uses</h1>
+  <PageHeader kicker="$ cat ~/uses.txt" title="Uses" lead="Hardware, software and security tooling I use day to day." />
+  <div class="prose mt-8">
   {/* TODO: every list below is a placeholder, replace with the real setup */}
-  <h2 class="mt-10 text-2xl font-bold">Hardware</h2>
-  <ul class="mt-4 list-disc pl-6">
+  <h2>Hardware</h2>
+  <ul>
     <li>Laptop: 14-inch ultrabook, 32 GB RAM</li>
     <li>Mechanical keyboard, 75% layout</li>
     <li>External 27-inch monitor</li>
   </ul>
 
-  <h2 class="mt-10 text-2xl font-bold">OS &amp; editor</h2>
-  <ul class="mt-4 list-disc pl-6">
+  <h2>OS &amp; editor</h2>
+  <ul>
     <li>Linux (Debian-based) as the daily driver</li>
     <li>Neovim for quick edits, VS Code for larger projects</li>
     <li>zsh with tmux</li>
   </ul>
 
-  <h2 class="mt-10 text-2xl font-bold">Security tooling</h2>
-  <ul class="mt-4 list-disc pl-6">
+  <h2>Security tooling</h2>
+  <ul>
     <li>Burp Suite Community for web testing</li>
     <li>Ghidra and GDB (with pwndbg) for reverse engineering</li>
     <li>Wireshark and nmap for network analysis</li>
     <li>pwntools and CyberChef for exploits and quick transformations</li>
   </ul>
 
-  <h2 class="mt-10 text-2xl font-bold">Homelab</h2>
-  <div class="table-wrap mt-4">
-    <table class="w-full border-collapse text-left">
-      <caption class="pb-2 text-left text-sm text-muted">Homelab machines and their roles</caption>
+  <h2>Homelab</h2>
+  <div class="table-wrap">
+    <table>
+      <caption class="text-left text-sm text-muted">Homelab machines and their roles</caption>
       <thead>
         <tr>
-          <th scope="col" class="border-b border-border px-3 py-2">Machine</th>
-          <th scope="col" class="border-b border-border px-3 py-2">Role</th>
-          <th scope="col" class="border-b border-border px-3 py-2">OS</th>
+          <th scope="col">Machine</th>
+          <th scope="col">Role</th>
+          <th scope="col">OS</th>
         </tr>
       </thead>
       <tbody>
-        <tr><th scope="row" class="border-b border-border px-3 py-2 font-normal">mini-pc</th><td class="border-b border-border px-3 py-2">Self-hosted services</td><td class="border-b border-border px-3 py-2">Debian</td></tr>
-        <tr><th scope="row" class="border-b border-border px-3 py-2 font-normal">pi</th><td class="border-b border-border px-3 py-2">DNS and monitoring</td><td class="border-b border-border px-3 py-2">Raspberry Pi OS</td></tr>
-        <tr><th scope="row" class="border-b border-border px-3 py-2 font-normal">vm-lab</th><td class="border-b border-border px-3 py-2">Vulnerable VMs for practice</td><td class="border-b border-border px-3 py-2">Various</td></tr>
+        <tr><th scope="row">mini-pc</th><td>Self-hosted services</td><td>Debian</td></tr>
+        <tr><th scope="row">pi</th><td>DNS and monitoring</td><td>Raspberry Pi OS</td></tr>
+        <tr><th scope="row">vm-lab</th><td>Vulnerable VMs for practice</td><td>Various</td></tr>
       </tbody>
     </table>
+  </div>
   </div>
 </BaseLayout>

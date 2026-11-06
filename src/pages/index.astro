@@ -5,62 +5,105 @@ import PostCard from '../components/PostCard.astro';
 import { getPublished } from '../lib/publishable.ts';
 import { getProjects } from '../lib/github.ts';
 import { readingMinutes } from '../lib/reading-time.ts';
-import { formatDate, isoDate } from '../lib/dates.ts';
+import { formatDate } from '../lib/dates.ts';
 
-const writeups = (await getPublished('writeups')).slice(0, 3);
-const notes = (await getPublished('notes')).slice(0, 3);
+const allWriteups = await getPublished('writeups');
+const allNotes = await getPublished('notes');
+const writeups = allWriteups.slice(0, 5);
+const notes = allNotes.slice(0, 3);
 const projects = (await getProjects()).slice(0, 3);
-const more = 'inline-block py-2 text-accent underline';
+const categories = [...new Set(allWriteups.map((e) => e.data.category))];
+const last = [...allWriteups, ...allNotes].map((e) => e.data.updated ?? e.data.date).sort((a, b) => b.getTime() - a.getTime())[0];
+const facts: [string, string][] = [
+  ['writeups', String(allWriteups.length)],
+  ['notes', String(allNotes.length)],
+  ['categories', categories.join(', ') || '—'],
+  ['last update', last ? formatDate(last) : '—'],
+];
+const more = 'font-mono text-sm text-accent no-underline hover:underline';
 ---
 <BaseLayout title="chiloute" description="Security notes, CTF writeups and projects.">
-  <h1 class="text-4xl font-bold"><span aria-hidden="true" class="font-mono text-muted">$ whoami<br /></span>chiloute</h1>
-  <p class="mt-2 font-mono text-lg text-muted">Security notes, CTF writeups and projects</p>
-  <p class="mt-4 max-w-prose">
-    {/* TODO: personalise the intro */}
-    Welcome. I write up CTF challenges, keep short security notes and build small tools. Everything here is meant to be read slowly and reproduced.
-  </p>
+  <section aria-labelledby="h-intro" class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div>
+      <p class="kicker m-0" aria-hidden="true">$ whoami</p>
+      <h1 id="h-intro" class="mt-3 text-5xl font-semibold tracking-tight sm:text-6xl">chiloute<span aria-hidden="true" class="text-accent">_</span></h1>
+      <p class="mt-5 max-w-[34ch] text-2xl leading-snug text-text">Security notes, CTF writeups and the small tools built along the way.</p>
+      <p class="mt-5 max-w-[60ch] text-muted">
+        {/* TODO: personalise the intro */}
+        Each writeup is meant to be reproduced: the commands, the dead ends and the reasoning, not only the flag.
+      </p>
+      <p class="mt-7 flex flex-wrap gap-3">
+        <a href="/writeups/" class="btn min-h-10 border-accent bg-accent px-4 text-accent-contrast hover:bg-bg hover:text-accent">Read the writeups</a>
+        <a href="/about/" class="btn min-h-10 px-4">About me</a>
+      </p>
+    </div>
+    <aside aria-label="Site summary" class="rounded-lg border border-border bg-surface font-mono text-sm">
+      <p aria-hidden="true" class="m-0 border-b border-border px-4 py-2 text-xs text-muted">~/.profile</p>
+      <dl class="m-0 space-y-2 px-4 py-4">
+        {facts.map(([k, v]) => (
+          <div class="flex gap-3"><dt class="w-28 shrink-0 text-muted">{k}</dt><dd class="m-0 text-text">{v}</dd></div>
+        ))}
+      </dl>
+    </aside>
+  </section>
 
-  <section aria-labelledby="h-writeups" class="mt-10">
-    <h2 id="h-writeups" class="text-2xl font-bold">Latest writeups</h2>
-    {writeups.length === 0 ? <p class="mt-4">No writeups published yet.</p> : (
-      <ul class="mt-4 list-none space-y-4 p-0">
+  <section aria-labelledby="h-writeups" class="mt-20">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <p class="kicker m-0" aria-hidden="true">~/writeups</p>
+        <h2 id="h-writeups" class="mt-1 text-2xl font-semibold">Latest writeups</h2>
+      </div>
+      <a href="/writeups/" class={more}>All writeups →</a>
+    </div>
+    {writeups.length === 0 ? <p class="mt-4 text-muted">No writeups published yet.</p> : (
+      <ul class="log mt-5">
         {writeups.map((e) => (
           <PostCard
-            href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+            level={3} href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
             readingMinutes={readingMinutes(e.body ?? '')} category={e.data.category} difficulty={e.data.difficulty}
             ctf={e.data.ctf} tags={e.data.tags}
           />
         ))}
       </ul>
     )}
-    <p class="mt-2"><a href="/writeups/" class={more}>All writeups</a></p>
   </section>
 
-  <section aria-labelledby="h-notes" class="mt-10">
-    <h2 id="h-notes" class="text-2xl font-bold">Latest notes</h2>
-    {notes.length === 0 ? <p class="mt-4">No notes published yet.</p> : (
-      <ul class="mt-4 list-none space-y-4 p-0">
-        {notes.map((e) => (
-          <li>
-            <article class="rounded border border-border p-4">
-              <h3 class="m-0 text-xl font-bold"><a href={`/notes/${e.id}/`} class="text-accent underline">{e.data.title}</a></h3>
-              <p class="mt-1 text-sm text-muted"><time datetime={isoDate(e.data.date)}>{formatDate(e.data.date)}</time></p>
-              <p class="mt-2">{e.data.description}</p>
-            </article>
-          </li>
-        ))}
-      </ul>
-    )}
-    <p class="mt-2"><a href="/notes/" class={more}>All notes</a></p>
-  </section>
+  <div class="mt-20 grid gap-16 lg:grid-cols-2">
+    <section aria-labelledby="h-notes">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="kicker m-0" aria-hidden="true">~/notes</p>
+          <h2 id="h-notes" class="mt-1 text-2xl font-semibold">Notes</h2>
+        </div>
+        <a href="/notes/" class={more}>All notes →</a>
+      </div>
+      {notes.length === 0 ? <p class="mt-4 text-muted">No notes published yet.</p> : (
+        <ul class="log mt-5">
+          {notes.map((e) => (
+            <li>
+              <article class="group relative py-4">
+                <h3 class="m-0 text-base font-semibold"><a href={`/notes/${e.id}/`} class="text-text no-underline after:absolute after:inset-0 group-hover:text-accent group-hover:underline">{e.data.title}</a></h3>
+                <p class="m-0 mt-1 text-[0.9375rem] text-muted">{e.data.description}</p>
+              </article>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
 
-  <section aria-labelledby="h-projects" class="mt-10">
-    <h2 id="h-projects" class="text-2xl font-bold">Featured projects</h2>
-    {projects.length === 0 ? <p class="mt-4">No projects to show yet.</p> : (
-      <ul class="mt-4 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p) => <li><ProjectCard project={p} level={3} /></li>)}
-      </ul>
-    )}
-    <p class="mt-2"><a href="/projects/" class={more}>All projects</a></p>
-  </section>
+    <section aria-labelledby="h-projects">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="kicker m-0" aria-hidden="true">~/projects</p>
+          <h2 id="h-projects" class="mt-1 text-2xl font-semibold">Projects</h2>
+        </div>
+        <a href="/projects/" class={more}>All projects →</a>
+      </div>
+      {projects.length === 0 ? <p class="mt-4 text-muted">No projects to show yet.</p> : (
+        <ul class="mt-5 grid list-none gap-3 p-0">
+          {projects.map((p) => <li><ProjectCard project={p} level={3} compact /></li>)}
+        </ul>
+      )}
+    </section>
+  </div>
 </BaseLayout>

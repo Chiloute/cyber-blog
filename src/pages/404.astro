@@ -1,12 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+const links = [['Home', '/'], ['Writeups', '/writeups/'], ['Notes', '/notes/'], ['Search', '/search/']] as const;
 ---
 <BaseLayout title="Page not found" description="This page does not exist." noindex>
-  <h1 class="text-3xl font-bold"><span aria-hidden="true" class="font-mono text-muted">$ cd ~<br /></span>404 — Page not found</h1>
-  <p class="mt-4 max-w-prose">The page you are looking for does not exist or has moved. Try one of these instead:</p>
-  <ul class="mt-4 list-disc pl-6">
-    <li><a href="/" class="text-accent underline">Home</a></li>
-    <li><a href="/writeups/" class="text-accent underline">Writeups</a></li>
-    <li><a href="/search/" class="text-accent underline">Search</a></li>
-  </ul>
+  <PageHeader kicker="$ cd ~  # 404" title="404 — Page not found" lead="The page you are looking for does not exist or has moved." />
+  <div class="mt-8 max-w-xl rounded-lg border border-border bg-surface font-mono text-sm">
+    <p aria-hidden="true" class="m-0 border-b border-border px-4 py-2 text-xs text-muted">try one of these</p>
+    <ul class="m-0 list-none space-y-1 p-4">
+      {links.map(([label, href]) => <li><a href={href} class="target-min"><span aria-hidden="true" class="text-muted">$ cd&nbsp;</span>{label}</a></li>)}
+    </ul>
+  </div>
 </BaseLayout>
