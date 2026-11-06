@@ -289,7 +289,7 @@ The site is self-hosted: a NixOS container on the server builds the flake and se
 ## Yearly maintenance
 
 - Renew security.txt: update `securityTxt.expires` in `src/config/site.ts`. The build warns when fewer than 30 days remain and fails once it has expired. Keep the value under one year ahead. Also replace `public/pgp-key.txt` (currently a `TODO` placeholder) with the real ASCII-armored public key, and update it when the key changes.
-- Review and merge Dependabot pull requests (`.github/dependabot.yml`: npm and GitHub Actions, weekly, grouped, versions younger than 7 days skipped). `flake.lock` is not covered: run `nix flake update` by hand.
+- Review and merge Dependabot pull requests (`.github/dependabot.yml`: npm and GitHub Actions, weekly, grouped, versions younger than 7 days skipped). `flake.lock` (Nix inputs) is updated weekly by Dependabot too.
 - Re-run the manual accessibility checklist and update the accessibility statement date.
 
 ## Commit convention
