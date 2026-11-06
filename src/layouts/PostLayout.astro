@@ -29,6 +29,9 @@ const section = p.kind === 'writeup' ? 'writeups' : 'notes';
 const base = Astro.site ?? new URL(SITE_URL);
 const ogImage = new URL(`/og/${section}/${p.id}.png`, base).href;
 const w = p.writeup;
+const hasToc = p.headings.filter((h) => h.depth === 2 || h.depth === 3).length >= 2;
+const dt = 'kicker';
+const dd = 'm-0 text-[0.9375rem]';
 ---
 <BaseLayout
   title={p.title}
@@ -46,26 +49,43 @@ const w = p.writeup;
     { name: p.title, path: `/${section}/${p.id}/` },
   ]}
 >
-  <article class="mx-auto max-w-[70ch]">
-    <header>
-      <h1 class="text-3xl font-bold">{p.title}</h1>
-      <p class="mt-2 text-sm text-muted">
-        <time datetime={isoDate(p.date)}>{formatDate(p.date)}</time>
-        {p.updated && <> · Updated <time datetime={isoDate(p.updated)}>{formatDate(p.updated)}</time></>}
-        · {p.readingMinutes} min read
-        {w && <> · {w.ctf}{w.points !== undefined && ` · ${w.points} pts`}{w.team && ` · ${w.team}`}</>}
-      </p>
-      <p class="mt-2 flex flex-wrap gap-2">
-        {w && <><Badge kind="category" value={w.category} /><Badge kind="difficulty" value={w.difficulty} /></>}
-        {p.tags.map((t) => <a href={`/writeups/tags/${encodeURIComponent(t)}/`} class="font-mono text-sm text-accent underline">#{t}</a>)}
-      </p>
+  <article class:list={['grid gap-x-14', hasToc && 'xl:grid-cols-[minmax(0,1fr)_15rem]']}>
+    <header class="max-w-[68ch] xl:col-span-2">
+      <p class="kicker m-0"><a href={`/${section}/`} class="text-muted hover:text-accent">~/{section}</a><span aria-hidden="true">/{p.id}</span></p>
+      <h1 class="mt-3 text-[2rem] leading-tight font-semibold tracking-tight sm:text-[2.5rem]">{p.title}</h1>
+      <p class="mt-4 text-lg text-muted">{p.description}</p>
+      <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-border py-5 sm:grid-cols-3 md:grid-cols-4">
+        {w && <div><dt class={dt}>CTF</dt><dd class={dd}>{w.ctf}</dd></div>}
+        {w && <div><dt class={dt}>Category</dt><dd class={dd}><Badge kind="category" value={w.category} /></dd></div>}
+        {w && <div><dt class={dt}>Difficulty</dt><dd class={dd}><Badge kind="difficulty" value={w.difficulty} /></dd></div>}
+        {w?.points !== undefined && <div><dt class={dt}>Points</dt><dd class={dd}>{w.points}</dd></div>}
+        {w?.team && <div><dt class={dt}>Team</dt><dd class={dd}>{w.team}</dd></div>}
+        <div><dt class={dt}>Published</dt><dd class={dd}><time datetime={isoDate(p.date)}>{formatDate(p.date)}</time></dd></div>
+        {p.updated && <div><dt class={dt}>Updated</dt><dd class={dd}><time datetime={isoDate(p.updated)}>{formatDate(p.updated)}</time></dd></div>}
+        <div><dt class={dt}>Reading time</dt><dd class={dd}>{p.readingMinutes} min</dd></div>
+      </dl>
+      {p.tags.length > 0 && (
+        <ul aria-label="Tags" class="m-0 mt-4 flex list-none flex-wrap gap-2 p-0 font-mono text-xs">
+          {p.tags.map((t) => (
+            <li>{p.kind === 'writeup'
+              ? <a href={`/writeups/tags/${encodeURIComponent(t)}/`} class="target-min rounded border border-border px-2 text-muted no-underline hover:border-accent hover:text-accent">#{t}</a>
+              : <span class="inline-flex rounded border border-border px-2 text-muted">#{t}</span>}</li>
+          ))}
+        </ul>
+      )}
+      {p.kind === 'writeup' && <Disclaimer />}
     </header>
-    {p.kind === 'writeup' && <Disclaimer />}
-    <TOC headings={p.headings} />
-    <div class="prose max-w-none">
-      <slot />
+    {hasToc && (
+      <aside class="xl:col-start-2 xl:row-start-2">
+        <div class="xl:sticky xl:top-6"><TOC headings={p.headings} /></div>
+      </aside>
+    )}
+    <div class="min-w-0 xl:col-start-1 xl:row-start-2">
+      <div class="prose">
+        <slot />
+      </div>
+      <PrevNext kind={p.kind} prev={p.prev} next={p.next} />
     </div>
-    <PrevNext kind={p.kind} prev={p.prev} next={p.next} />
   </article>
   <script>
     import '../scripts/copy-code.ts';

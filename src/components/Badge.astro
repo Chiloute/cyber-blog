@@ -3,14 +3,22 @@ interface Props { kind: 'category' | 'difficulty'; value: string }
 const { kind, value } = Astro.props;
 // Full class strings so Tailwind can see them. Text is always visible; color is supplementary.
 const colors: Record<string, string> = {
-  web: 'text-cat-web border-cat-web', crypto: 'text-cat-crypto border-cat-crypto', pwn: 'text-cat-pwn border-cat-pwn',
-  reverse: 'text-cat-reverse border-cat-reverse', forensic: 'text-cat-forensic border-cat-forensic',
-  osint: 'text-cat-osint border-cat-osint', misc: 'text-cat-misc border-cat-misc',
-  easy: 'text-diff-easy border-diff-easy', medium: 'text-diff-medium border-diff-medium',
-  hard: 'text-diff-hard border-diff-hard', insane: 'text-diff-insane border-diff-insane',
+  web: 'text-cat-web', crypto: 'text-cat-crypto', pwn: 'text-cat-pwn', reverse: 'text-cat-reverse',
+  forensic: 'text-cat-forensic', osint: 'text-cat-osint', misc: 'text-cat-misc',
+  easy: 'text-diff-easy', medium: 'text-diff-medium', hard: 'text-diff-hard', insane: 'text-diff-insane',
 };
-const prefix = kind === 'category' ? '#' : '▲';
+// Difficulty as a 4-step meter (decorative) next to its name.
+const level = ['easy', 'medium', 'hard', 'insane'].indexOf(value) + 1;
 ---
-<span class:list={['inline-flex items-center gap-1 rounded border px-2 py-0.5 font-mono text-sm', colors[value]]}>
-  <span aria-hidden="true">{prefix}</span>{kind === 'difficulty' ? <span class="sr-only">Difficulty: </span> : null}{value}
-</span>
+{kind === 'category' ? (
+  <span class:list={['font-mono text-[0.8125rem] whitespace-nowrap', colors[value]]}>
+    <span aria-hidden="true" class="text-muted">[</span>{value}<span aria-hidden="true" class="text-muted">]</span>
+  </span>
+) : (
+  <span class:list={['inline-flex items-center gap-1.5 font-mono text-[0.8125rem] whitespace-nowrap', colors[value]]}>
+    <span aria-hidden="true" class="inline-flex gap-0.5">
+      {[1, 2, 3, 4].map((i) => <span class:list={['h-2.5 w-1 rounded-[1px]', i <= level ? 'bg-current' : 'bg-border']} />)}
+    </span>
+    <span class="sr-only">Difficulty: </span>{value}
+  </span>
+)}

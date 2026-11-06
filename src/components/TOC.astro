@@ -7,17 +7,18 @@ for (const h of hs) {
   if (h.depth === 3 && groups.length) groups[groups.length - 1]!.kids.push(h);
   else groups.push({ h, kids: [] });
 }
+const link = 'target-min text-muted no-underline hover:text-accent hover:underline';
 ---
 {hs.length >= 2 && (
-  <nav aria-label="Table of contents" class="my-6 rounded border border-border bg-surface p-4">
-    <p class="m-0 font-bold">Contents</p>
-    <ol class="m-0 mt-2 list-none space-y-1 p-0">
+  <nav aria-label="Table of contents" class="my-8 border-l-2 border-border pl-4 text-sm xl:my-0">
+    <p class="kicker m-0 mb-2">Contents</p>
+    <ol class="m-0 list-none space-y-1 p-0">
       {groups.map(({ h, kids }) => (
         <li>
-          <a href={`#${h.slug}`} class="text-accent underline">{h.text}</a>
+          <a href={`#${h.slug}`} class={link}>{h.text}</a>
           {kids.length > 0 && (
-            <ol class="list-none space-y-1 pl-4 pt-1">
-              {kids.map((k) => <li><a href={`#${k.slug}`} class="text-accent underline">{k.text}</a></li>)}
+            <ol class="m-0 list-none space-y-1 py-1 pl-3">
+              {kids.map((k) => <li><a href={`#${k.slug}`} class={link}>{k.text}</a></li>)}
             </ol>
           )}
         </li>

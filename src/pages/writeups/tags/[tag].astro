@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
+import PageHeader from '../../../components/PageHeader.astro';
 import { getPublished } from '../../../lib/publishable.ts';
 import { readingMinutes } from '../../../lib/reading-time.ts';
 
@@ -19,9 +20,10 @@ const { tag, entries } = Astro.props;
   description={`CTF writeups tagged ${tag}.`}
   breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Writeups', path: '/writeups/' }, { name: `Tag: ${tag}`, path: `/writeups/tags/${encodeURIComponent(tag)}/` }]}
 >
-  <h1 class="text-3xl font-bold">Writeups tagged “{tag}”</h1>
-  <p class="mt-2"><a href="/writeups/" class="text-accent underline">All writeups</a></p>
-  <ul class="mt-6 list-none space-y-4 p-0">
+  <PageHeader kicker={`$ grep -l "#${tag}" ~/writeups`} title={`Writeups tagged “${tag}”`}>
+    <p class="mt-3"><a href="/writeups/" class="font-mono text-sm">← All writeups</a></p>
+  </PageHeader>
+  <ul class="log mt-8">
     {entries.map((e) => (
       <PostCard
         href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
