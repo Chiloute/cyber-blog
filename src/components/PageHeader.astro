@@ -1,0 +1,11 @@
+---
+// Shared page heading: decorative shell kicker, the page <h1>, optional lead paragraph.
+interface Props { kicker: string; title: string; lead?: string }
+const { kicker, title, lead } = Astro.props;
+---
+<header class="max-w-[60ch]">
+  <p class="kicker m-0" aria-hidden="true">{kicker}</p>
+  <h1 class="mt-2 text-4xl font-semibold tracking-tight">{title}</h1>
+  {lead && <p class="mt-3 text-lg text-muted">{lead}</p>}
+  <slot />
+</header>

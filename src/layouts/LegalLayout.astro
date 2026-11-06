@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
 
 interface Props {
   title: string;
@@ -11,9 +12,10 @@ const { title, description, updated } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} pagefindBody={false}>
-  <article class="prose mx-auto max-w-3xl">
-    <h1>{title}</h1>
-    <p>Last updated: <time datetime={updated}>{updated}</time></p>
+  <PageHeader kicker="$ cat ~/legal" title={title}>
+    <p class="kicker mt-3">Last updated: <time datetime={updated}>{updated}</time></p>
+  </PageHeader>
+  <article class="prose mt-8">
     <slot />
   </article>
 </BaseLayout>
