@@ -97,7 +97,7 @@ scripts/         check-embargo, check-contrast, generate-icons
 tests/           Playwright specs
 docs/            security, contrast, api-verification, manual a11y checklist
 public/          static files, including _headers and _redirects
-.github/         CI workflow, Dependabot
+.github/         CI workflows, shared setup action, Dependabot
 ```
 
 ## Configuration
@@ -157,7 +157,7 @@ From `src/content.config.ts`:
 ### Draft and embargo
 
 - `draft: true` excludes the entry from every listing, feed, sitemap, OG image and JSON-LD of `npm run build`. Drafts stay visible in `npm run dev` (and in the test-only `npm run build:test`), so you can preview them locally. Project MDX files (`src/content/projects/`) accept `draft` too.
-- `publishAfter: <date>` excludes the entry until that date. It is evaluated at build time (`isPublishable`: published when `draft` is not `true` and `publishAfter` is unset or `<= now`). The site does not change by itself: the CI workflow also runs a daily scheduled build (`cron: '17 5 * * *'` in `.github/workflows/ci.yml`), and the first build after the date publishes the entry. Until a deploy job is enabled, that build does not reach a host (see Deployment).
+- `publishAfter: <date>` excludes the entry until that date. It is evaluated at build time (`isPublishable`: published when `draft` is not `true` and `publishAfter` is unset or `<= now`). The site does not change by itself: the Publish workflow runs a daily scheduled build (`cron: '17 5 * * *'` in `.github/workflows/publish.yml`), and the first build after the date publishes the entry. Until a deploy job is enabled, that build does not reach a host (see Deployment).
 - `npm run check:embargo` fails the build if a blocked entry (slug or title) appears in `dist/`.
 
 ### Body
@@ -260,14 +260,19 @@ The target is WCAG 2.2 AA in both themes (see `/accessibility/`, `src/pages/acce
 The hosting provider is not chosen yet.
 
 - `public/_headers` and `public/_redirects` are read natively by Cloudflare Pages and Netlify. Vercel and Nginx equivalents are in `docs/security.md`. Netlify's handling of overlapping `_headers` rules is untested.
-- The `deploy` job in `.github/workflows/ci.yml` is disabled (`if: false`) and only contains an outline. To enable it: remove that line, add the provider steps and secrets, and deploy only on pushes to `main` and on the daily schedule, never on pull requests.
-- GitHub settings to enable manually: Dependabot alerts and Dependabot security updates; branch protection on `main` requiring the `verify` CI job.
-- CI (`verify` job): `npm ci`, lint, `check`, tests, `check:contrast`, `npm audit --audit-level=high`, build, `check:embargo`, Playwright a11y tests.
+- CI workflows (`.github/workflows/`):
+  - `ci.yml` (pull requests, pushes to `main`): `static` (lint, `astro check`, unit tests, `check:contrast`) must pass before `build` and `e2e` start. `build` (`build.yml`) runs the production build and `check:embargo`, then keeps `dist/` as the `site` artifact (30 days). `e2e` runs the Playwright a11y tests on the draft-inclusive test build. `ci-ok` fails if any of them failed or was skipped. On `main`, `deploy` ships the `site` artifact.
+  - `publish.yml` (daily cron, manual): `build.yml` then `deploy.yml`, so embargoed entries go live without a new commit.
+  - `deploy.yml` (reusable): downloads the `site` artifact and ships it as is, never rebuilds. `environment: production`, one deploy at a time. Rollback: re-run the `deploy` job of an older run (its artifact is kept 30 days).
+  - `security.yml`: `npm audit --audit-level=high` on lockfile changes and weekly.
+  - `workflows-lint.yml`: actionlint and zizmor on changes under `.github/`.
+- The deploy job is off and only contains an outline. To enable it: add the provider steps and the `production` environment secrets, then create the repository variable `DEPLOY_ENABLED=true`.
+- GitHub settings to enable manually: Dependabot alerts and Dependabot security updates; branch protection (or a ruleset) on `main` requiring the `ci-ok` status check, so a pull request cannot be merged unless `astro check`, the build and `check:embargo` passed.
 
 ## Yearly maintenance
 
 - Renew security.txt: update `securityTxt.expires` in `src/config/site.ts`. The build warns when fewer than 30 days remain and fails once it has expired. Keep the value under one year ahead. Also replace `public/pgp-key.txt` (currently a `TODO` placeholder) with the real ASCII-armored public key, and update it when the key changes.
-- Review and merge Dependabot pull requests (`.github/dependabot.yml`: npm and GitHub Actions, weekly, grouped).
+- Review and merge Dependabot pull requests (`.github/dependabot.yml`: npm and GitHub Actions, weekly, grouped, versions younger than 7 days skipped).
 - Re-run the manual accessibility checklist and update the accessibility statement date.
 
 ## Commit convention

@@ -85,9 +85,9 @@ No suffix-splat pattern (such as `/*.xml`) is used: it is not reliably supported
 ## Supply chain
 
 - `package-lock.json` is committed and used with `npm ci` in builds, so installed versions are reproducible.
-- `npm audit` is run during review. At the time of writing it reports 2 moderate issues, both through `@tailwindcss/typography` → `postcss-selector-parser`. The only fix offered is a downgrade, so they are accepted and tracked in `docs/api-verification.md`.
-- Dependabot (or an equivalent update tool) for npm and GitHub Actions is planned. It is not configured by this task.
-- GitHub Actions in CI are pinned to full commit SHAs, not tags. CI is added by a separate task, not this one.
+- `npm audit --audit-level=high` runs in `.github/workflows/security.yml` (lockfile changes and weekly). At the time of writing it reports 2 moderate issues, both through `@tailwindcss/typography` → `postcss-selector-parser`. The only fix offered is a downgrade, so they are accepted and tracked in `docs/api-verification.md`.
+- Dependabot updates npm and GitHub Actions weekly, with a 7-day cooldown on new versions.
+- GitHub Actions in CI are pinned to full commit SHAs, not tags. Workflows default to `permissions: {}`, `npm ci` runs with `--ignore-scripts`, and the `GH_PROJECTS_TOKEN` secret is never given to pull request builds.
 
 ## No source maps
 
