@@ -15,7 +15,8 @@ export default defineConfig({
   }],
   webServer: {
     // --ignore-lock: Astro 7 auto-backgrounds preview when it detects an AI agent, which makes Playwright think it exited.
-    command: 'npx astro preview --port 4321 --ignore-lock',
+    // Serves the test build (drafts included, run `npm run build:test` first), never the production dist/.
+    command: 'npx astro preview --port 4321 --ignore-lock --outDir dist-test',
     url: 'http://localhost:4321',
     reuseExistingServer: !CI,
   },

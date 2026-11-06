@@ -3,7 +3,7 @@ import astro from 'eslint-plugin-astro';
 
 export default tseslint.config(
   // '.astro/' is the generated cache dir; .astro source files ARE linted.
-  { ignores: ['dist/', '.astro/', 'node_modules/', 'public/', 'playwright-report/', 'test-results/'] },
+  { ignores: ['dist/', 'dist-test/', '.design/', '.astro/', 'node_modules/', 'public/', 'playwright-report/', 'test-results/'] },
   tseslint.configs.recommended,
   astro.configs['flat/recommended'],
   astro.configs['flat/jsx-a11y-strict'],

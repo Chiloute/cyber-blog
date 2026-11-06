@@ -52,14 +52,16 @@ test('mobile menu: Escape closes and refocuses button', async ({ page }) => {
 test('writeup filters update live count', async ({ page }) => {
   await page.goto('/writeups/');
   const count = page.locator('[data-count]');
-  await expect(count).toHaveText('Showing 1 of 1 writeups');
-  // Only the "web" option exists with one example writeup, so the count stays 1; assert the live region and URL sync.
+  const total = await page.locator('[data-post]').count();
+  await expect(count).toHaveText(`Showing ${total} of ${total} writeups`);
   await expect(count).toHaveAttribute('role', 'status');
+  // Fixtures: exactly one "web" writeup (example-web-ssti), the draft example is "reverse".
   await page.locator('#f-category').selectOption('web');
-  await expect(count).toHaveText('Showing 1 of 1 writeups');
+  await expect(count).toHaveText(`Showing 1 of ${total} writeups`);
   await expect(page).toHaveURL(/\?category=web/);
   await page.getByRole('button', { name: 'Reset' }).click();
   await expect(page).not.toHaveURL(/category=/);
+  await expect(count).toHaveText(`Showing ${total} of ${total} writeups`);
 });
 
 test('search finds the example writeup', async ({ page }) => {

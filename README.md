@@ -70,7 +70,8 @@ Entering the shell installs the git hooks automatically (`.pre-commit-config.yam
 | `npm run check` | `astro check`, type and Astro diagnostics |
 | `npm run lint` | `eslint .` |
 | `npm test` | `node --test 'src/**/*.test.ts'`, unit tests |
-| `npm run test:a11y` | `playwright test`: axe-core on sample pages in both themes, plus behaviour tests. Needs a prior `npm run build` (the Playwright web server runs `astro preview`) |
+| `npm run build:test` | Test-only build into `dist-test/` with drafts included (`BLOG_TEST_DRAFTS=1`, embargo still applied). Never deploy it |
+| `npm run test:a11y` | `playwright test`: axe-core on sample pages in both themes, plus behaviour tests. Needs a prior `npm run build:test` (the Playwright web server runs `astro preview --outDir dist-test`) |
 | `npm run check:embargo` | `node scripts/check-embargo.mjs`: fails if a draft or embargoed entry leaks into `dist/` |
 | `npm run check:contrast` | `node scripts/check-contrast.mjs`: WCAG contrast of the tokens in `src/styles/global.css` (`--markdown` prints the table used in `docs/contrast.md`) |
 
@@ -155,7 +156,7 @@ From `src/content.config.ts`:
 
 ### Draft and embargo
 
-- `draft: true` excludes the entry from every listing, feed, sitemap, OG image and JSON-LD.
+- `draft: true` excludes the entry from every listing, feed, sitemap, OG image and JSON-LD of `npm run build`. Drafts stay visible in `npm run dev` (and in the test-only `npm run build:test`), so you can preview them locally. Project MDX files (`src/content/projects/`) accept `draft` too.
 - `publishAfter: <date>` excludes the entry until that date. It is evaluated at build time (`isPublishable`: published when `draft` is not `true` and `publishAfter` is unset or `<= now`). The site does not change by itself: the CI workflow also runs a daily scheduled build (`cron: '17 5 * * *'` in `.github/workflows/ci.yml`), and the first build after the date publishes the entry. Until a deploy job is enabled, that build does not reach a host (see Deployment).
 - `npm run check:embargo` fails the build if a blocked entry (slug or title) appears in `dist/`.
 
@@ -225,6 +226,7 @@ Same body rules as writeups. Example: `src/content/notes/linux-privesc-cheatshee
 | Field | Type | Required |
 |---|---|---|
 | `repo` | string matching `owner/name` | yes |
+| `draft` | boolean, default `false` (hidden from `npm run build`, shown in `npm run dev`) | no |
 | `title` | string | no |
 | `demo` | URL | no |
 | `cover` | `{ image, alt, decorative }`, same rules as writeups | no |

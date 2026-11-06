@@ -21,7 +21,9 @@ async function open(page: Page, url: string, theme: (typeof THEMES)[number]) {
   await page.emulateMedia({ colorScheme: theme });
   page.on('console', (m) => { if (m.type() === 'error') problems.push(`console: ${m.text()}`); });
   page.on('pageerror', (e) => problems.push(`pageerror: ${e.message}`));
-  await page.goto(url);
+  const res = await page.goto(url);
+  // A missing page would silently test the 404 template instead: require 200 for every real page.
+  expect(res?.status(), `HTTP status of ${url}`).toBe(url === '/does-not-exist/' ? 404 : 200);
   await page.waitForLoadState('networkidle');
   return problems;
 }
