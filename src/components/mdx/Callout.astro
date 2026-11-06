@@ -6,17 +6,18 @@ interface Props {
 const { type = 'info', title } = Astro.props;
 const label = { info: 'Info', warning: 'Warning', tip: 'Tip' }[type];
 // Full class strings so Tailwind can see them.
-const color = { info: 'border-info text-info', warning: 'border-warning text-warning', tip: 'border-success text-success' }[type];
+const color = { info: 'border-info', warning: 'border-warning', tip: 'border-success' }[type];
+const tone = { info: 'text-info', warning: 'text-warning', tip: 'text-success' }[type];
 const icon = {
   info: 'M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z',
   warning: 'M12 2L1 21h22zm1 15h-2v-2h2zm0-4h-2V9h2z',
   tip: 'M9 21h6v-1H9zm3-19a7 7 0 00-4 12.7V17h8v-2.3A7 7 0 0012 2z',
 }[type];
 ---
-<aside aria-label={title ?? label} class:list={['not-prose my-6 rounded border border-l-4 bg-surface p-4', color]}>
-  <p class="m-0 flex items-center gap-2 font-bold">
-    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="size-5 shrink-0 fill-current"><path d={icon} /></svg>
-    <span>{label}{title ? `: ${title}` : ''}</span>
+<aside aria-label={title ?? label} class:list={['not-prose my-7 rounded-r-lg border-l-[3px] bg-surface px-5 py-4', color]}>
+  <p class:list={['m-0 flex items-center gap-2 font-mono text-[0.8125rem] font-bold uppercase tracking-wide', tone]}>
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" class="size-4 shrink-0 fill-current"><path d={icon} /></svg>
+    <span>{label}{title && <span class="normal-case tracking-normal text-text">: {title}</span>}</span>
   </p>
-  <div class="mt-2 text-text [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2"><slot /></div>
+  <div class="mt-2 text-[0.9875rem] leading-relaxed text-text [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2 [&_code]:text-[0.85em]"><slot /></div>
 </aside>

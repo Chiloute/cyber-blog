@@ -13,8 +13,7 @@ function upgrade(root: HTMLElement) {
   button.setAttribute('aria-expanded', 'false');
   button.setAttribute('aria-controls', id);
   button.textContent = `Reveal ${label}`;
-  button.className =
-    'target-min cursor-pointer rounded border border-border-ui bg-surface px-3 py-1 font-bold text-text';
+  button.className = 'btn';
 
   const status = document.createElement('span');
   status.className = 'sr-only';
@@ -29,8 +28,12 @@ function upgrade(root: HTMLElement) {
     status.textContent = open ? `${label[0]?.toUpperCase()}${label.slice(1)} revealed` : `${label[0]?.toUpperCase()}${label.slice(1)} hidden`;
   });
 
-  code.classList.add('ml-2');
-  root.replaceChildren(button, code, status);
+  // Decorative redaction bar while the flag is hidden (report style).
+  const bar = document.createElement('span');
+  bar.className = 'redacted';
+  bar.setAttribute('aria-hidden', 'true');
+  button.addEventListener('click', () => { bar.hidden = !code.hidden; });
+  root.replaceChildren(button, bar, code, status);
 }
 
 function init() {

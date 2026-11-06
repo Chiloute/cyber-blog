@@ -37,14 +37,14 @@ function enhance(pre: HTMLElement) {
   if (!wrap) {
     wrap = document.createElement('div');
     wrap.dataset.copyWrap = '';
+    wrap.className = 'code-block not-prose';
     pre.replaceWith(wrap);
     wrap.append(pre);
   }
 
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className =
-    'copy target-min cursor-pointer rounded border border-border-ui bg-surface px-2 text-sm text-text';
+  btn.className = 'copy btn btn-sm';
   btn.textContent = IDLE;
   btn.setAttribute('aria-label', 'Copy code to clipboard');
 
@@ -70,11 +70,23 @@ function enhance(pre: HTMLElement) {
       flash('Failed', 'Copy failed');
     }
   });
-  // Header bar above the pre: the button never overlaps code.
-  const bar = document.createElement('div');
-  bar.className = 'flex justify-end border border-b-0 border-border bg-surface p-1';
+  // Window bar above the pre (the button never overlaps code). Terminal ships its own bar.
+  let bar = wrap.querySelector<HTMLElement>('[data-code-bar]');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.className = 'code-bar';
+    bar.dataset.codeBar = '';
+    const name = document.createElement('span');
+    name.setAttribute('aria-hidden', 'true');
+    const dots = document.createElement('span');
+    dots.className = 'code-dots';
+    dots.append(document.createElement('span'), document.createElement('span'), document.createElement('span'));
+    const lang = pre.dataset.language;
+    name.append(dots, lang && lang !== 'plaintext' ? lang : 'text');
+    bar.append(name);
+    pre.before(bar);
+  }
   bar.append(btn);
-  pre.before(bar);
 }
 
 // Unique, useful landmark names (axe landmark-unique): "Code block N, lang"; repeated terminal titles get " N".

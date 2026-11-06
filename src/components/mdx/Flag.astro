@@ -7,10 +7,10 @@ interface Props {
 }
 const { value, label = 'Flag' } = Astro.props;
 ---
-<div data-flag data-label={label} class="not-prose my-4">
+<div data-flag data-label={label} class="not-prose my-6 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3">
   <details>
-    <summary class="min-h-6 cursor-pointer font-bold">Reveal {label.toLowerCase()}</summary>
-    <code class="mt-2 inline-block rounded bg-code-bg px-2 py-1 break-all [overflow-wrap:anywhere]">{value}</code>
+    <summary class="min-h-6 cursor-pointer font-mono text-sm font-bold">Reveal {label.toLowerCase()}</summary>
+    <code class="mt-2 inline-block break-all [overflow-wrap:anywhere]">{value}</code>
   </details>
 </div>
 <script>

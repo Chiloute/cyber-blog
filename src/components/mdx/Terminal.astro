@@ -8,14 +8,16 @@ interface Props {
 }
 const { prompt = '$', title, commands } = Astro.props;
 ---
-<figure class="not-prose my-6">
-  {title && <figcaption class="rounded-t border border-b-0 border-border bg-surface px-3 py-1 text-sm text-muted">{title}</figcaption>}
+<div class="not-prose code-block">
   <div data-copy-wrap>
-    <pre data-terminal tabindex="0" role="region" aria-label={title ? `Terminal: ${title}` : 'Terminal'} class="m-0 font-mono text-sm">{commands.map((c) => (
-      <><span class="block"><span aria-hidden="true" class="select-none text-muted">{prompt} </span><span data-cmd>{c.cmd}</span></span>{c.output && <span class="block whitespace-pre text-muted">{c.output}</span>}</>
+    <div data-code-bar class="code-bar">
+      <span aria-hidden="true" class="flex items-center"><span class="code-dots"><span></span><span></span><span></span></span>{title ?? 'terminal'}</span>
+    </div>
+    <pre data-terminal tabindex="0" role="region" aria-label={title ? `Terminal: ${title}` : 'Terminal'} class="text-[0.875rem]">{commands.map((c) => (
+      <><span class="block"><span aria-hidden="true" class="select-none text-accent">{prompt} </span><span data-cmd class="font-bold">{c.cmd}</span></span>{c.output && <span class="mb-2 block whitespace-pre text-muted">{c.output}</span>}</>
     ))}</pre>
   </div>
-</figure>
+</div>
 <script>
   import '../../scripts/copy-code.ts';
 </script>
