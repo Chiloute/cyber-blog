@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "test": "node --test 'src/**/*.test.ts'",
     "test:a11y": "playwright test",
-    "check:embargo": "node scripts/check-embargo.mjs",
+    "check:drafts": "node scripts/check-drafts.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
     "build:test": "BLOG_TEST_DRAFTS=1 astro build --outDir dist-test && pagefind --site dist-test"
   },

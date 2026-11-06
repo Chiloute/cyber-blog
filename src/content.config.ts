@@ -25,7 +25,6 @@ const writeups = defineCollection({
       tags: z.array(z.string()).default([]),
       team: z.string().optional(),
       draft: z.boolean().default(false),
-      publishAfter: z.coerce.date().optional(),
       cover: cover(image).optional(),
     }),
 });
@@ -39,7 +38,6 @@ const notes = defineCollection({
     updated: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
-    publishAfter: z.coerce.date().optional(),
   }),
 });
 

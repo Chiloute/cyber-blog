@@ -65,10 +65,39 @@
             stages = [ "pre-push" ];
           };
         };
+
+      # The production site (dist/). Built offline: the projects page uses src/data/projects.fallback.json.
+      site = pkgs:
+        let lib = pkgs.lib; in
+        pkgs.buildNpmPackage {
+          pname = "chiloute-blog";
+          version = "0.0.1";
+          src = lib.fileset.toSource {
+            root = ./.;
+            fileset = lib.fileset.unions [
+              ./src ./public ./scripts ./package.json ./package-lock.json ./astro.config.mjs ./tsconfig.json
+            ];
+          };
+          nodejs = pkgs.nodejs_24;
+          # Reads the integrity hashes from package-lock.json: no npmDepsHash to bump on each Dependabot PR.
+          npmDeps = pkgs.importNpmLock {
+            package = lib.importJSON ./package.json;
+            packageLock = lib.importJSON ./package-lock.json;
+          };
+          npmConfigHook = pkgs.importNpmLock.npmConfigHook;
+          npmFlags = [ "--ignore-scripts" ];
+          env.ASTRO_TELEMETRY_DISABLED = "1";
+          doCheck = true;
+          checkPhase = "npm run check:drafts";
+          installPhase = "cp -r dist $out";
+        };
     in
     {
+      packages = forAllSystems (_system: pkgs: { default = site pkgs; });
+
       checks = forAllSystems (system: pkgs: {
         pre-commit-check = git-hooks.lib.${system}.run { src = ./.; hooks = cheapHooks pkgs; };
+        site = self.packages.${system}.default;
       });
 
       devShells = forAllSystems (system: pkgs:
