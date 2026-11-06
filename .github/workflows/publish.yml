@@ -1,0 +1,24 @@
+name: Publish
+
+# Daily rebuild: publishAfter is evaluated at BUILD time, so an embargoed writeup is only published
+# by the first build that runs after its date has passed. Code is unchanged since CI, so no lint/tests here.
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yml
+    secrets:
+      GH_PROJECTS_TOKEN: ${{ secrets.GH_PROJECTS_TOKEN }}
+
+  deploy:
+    needs: build
+    permissions:
+      contents: read
+    uses: ./.github/workflows/deploy.yml

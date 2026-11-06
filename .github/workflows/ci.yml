@@ -4,46 +4,52 @@ on:
   push:
     branches: [main]
   pull_request:
-  schedule:
-    # Daily rebuild: publishAfter is evaluated at BUILD time, so an embargoed writeup is only published
-    # by the first build that runs after its date has passed.
-    - cron: '17 5 * * *'
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# static (lint, astro check, unit tests) gates both builds; only a verified build reaches deploy.
 jobs:
-  verify:
+  static:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
+      - uses: ./.github/actions/setup
       - run: npm run lint
       - run: npm run check
       - run: npm test
       - run: npm run check:contrast
-      # Gate on high/critical only: the current moderate advisory (postcss-selector-parser via
-      # @tailwindcss/typography) has only a downgrade fix. To tighten, change to --audit-level=moderate.
-      - run: npm audit --audit-level=high
-      - run: npm run build
-        env:
-          # Fine-grained, read-only token. The build works without it (fallback data).
-          GITHUB_TOKEN: ${{ secrets.GH_PROJECTS_TOKEN }}
-      - run: npm run check:embargo
+
+  build:
+    needs: static
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yml
+    secrets:
+      GH_PROJECTS_TOKEN: ${{ secrets.GH_PROJECTS_TOKEN }}
+
+  e2e:
+    needs: static
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
       - run: npx playwright install --with-deps chromium
-      # Separate test build (dist-test/, drafts included, never deployed); dist/ above stays the production output.
+      # Separate test build (dist-test/, drafts included, never deployed).
       - run: npm run build:test
       - run: npm run test:a11y
         env:
@@ -51,25 +57,26 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: failure()
         with:
-          name: debug-artifacts
+          name: e2e-debug
           path: |
-            dist
             playwright-report
             test-results
           retention-days: 7
 
-  deploy:
-    needs: verify
-    if: false # TODO: hosting provider not chosen yet; remove this line once a provider is set up.
+  # Single required status check for branch protection on main.
+  ci-ok:
+    if: always()
+    needs: [static, build, e2e]
     runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, e2e]
     permissions:
       contents: read
-      # deployments: write  # only if the provider action creates GitHub deployments
-    steps:
-      # Outline for Cloudflare Pages (direct upload via wrangler), to be done when chosen:
-      #  1. checkout (persist-credentials: false), setup-node, npm ci
-      #  2. npm run build (same env as above)
-      #  3. npx wrangler pages deploy dist --project-name <name> --branch main
-      #     with secrets CLOUDFLARE_API_TOKEN (Pages:Edit only) and CLOUDFLARE_ACCOUNT_ID
-      #  4. only on push to main and on the daily schedule, never on pull_request
-      - run: echo "deploy placeholder"
+    uses: ./.github/workflows/deploy.yml
