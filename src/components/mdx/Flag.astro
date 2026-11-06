@@ -1,0 +1,18 @@
+---
+// Progressive enhancement: without JS this is a closed <details> (flag reachable, not visible).
+// src/scripts/flag.ts replaces it with an aria-expanded button + hidden <code> + live region.
+interface Props {
+  value: string;
+  label?: string;
+}
+const { value, label = 'Flag' } = Astro.props;
+---
+<div data-flag data-label={label} class="not-prose my-4">
+  <details>
+    <summary class="min-h-6 cursor-pointer font-bold">Reveal {label.toLowerCase()}</summary>
+    <code class="mt-2 inline-block rounded bg-code-bg px-2 py-1 break-all [overflow-wrap:anywhere]">{value}</code>
+  </details>
+</div>
+<script>
+  import '../../scripts/flag.ts';
+</script>
