@@ -1,69 +1,77 @@
 @import "tailwindcss";
-@import "@fontsource/jetbrains-mono/400.css";
-@import "@fontsource/jetbrains-mono/700.css";
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-400-italic.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-700.css";
+@import "@fontsource/jetbrains-mono/latin-400.css";
+@import "@fontsource/jetbrains-mono/latin-700.css";
 @plugin "@tailwindcss/typography";
 
-/* Dark variant keys on <html data-theme="dark">. The theme script (separate task) always
-   resolves the preference to 'light' | 'dark' in data-theme and stores the user choice in
-   data-theme-pref ('light' | 'dark' | 'system'). No prefers-color-scheme media block here
-   (single source of truth for dark tokens). Without JS the light theme is served. */
+/* Dark variant keys on <html data-theme="dark">. The theme script always resolves the preference
+   to 'light' | 'dark' in data-theme (choice kept in data-theme-pref). Without JS: light theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* Tokens: plain #rrggbb only. scripts/check-contrast.mjs parses these two blocks. */
+/* Direction: "red team report". Neutral report paper / near-black, offensive red for links and
+   prompts, hazard amber for active state, focus and highlights; difficulty uses a severity scale. Tokens: plain #rrggbb only (scripts/check-contrast.mjs
+   parses these two blocks). */
 :root {
   color-scheme: light;
-  --bg: #faf8f3;
-  --surface: #f0ece2;
-  --text: #1c1b19;
-  --muted: #5a564d;
-  --accent: #0b5a87;
+  --bg: #f7f6f3;
+  --surface: #ecebe7;
+  --text: #18181b;
+  --muted: #55555d;
+  --accent: #b0121c;
   --accent-contrast: #ffffff;
-  --border: #d9d3c5;
-  --border-ui: #787265;
-  --focus: #0b5a87;
-  --code-bg: #ebe6da;
-  --success: #1c6638;
-  --warning: #85500a;
-  --info: #0b5a87;
-  --cat-web: #0b5a87;
-  --cat-crypto: #6a3d9a;
-  --cat-pwn: #a1262b;
-  --cat-reverse: #85500a;
-  --cat-forensic: #1c6638;
-  --cat-osint: #006b6b;
-  --cat-misc: #5a564d;
-  --diff-easy: #1c6638;
-  --diff-medium: #85500a;
-  --diff-hard: #a1262b;
-  --diff-insane: #6a3d9a;
+  --highlight: #954300;
+  --highlight-bg: #f6dfc9;
+  --border: #d8d6d0;
+  --border-ui: #76757d;
+  --focus: #954300;
+  --code-bg: #eae8e3;
+  --success: #1b673a;
+  --warning: #8a4a00;
+  --info: #1d5a8a;
+  --cat-web: #1d5a8a;
+  --cat-crypto: #6a3d9e;
+  --cat-pwn: #b0121c;
+  --cat-reverse: #8a4a00;
+  --cat-forensic: #1b673a;
+  --cat-osint: #00676a;
+  --cat-misc: #55555d;
+  --diff-easy: #1d5a8a;
+  --diff-medium: #8a5a00;
+  --diff-hard: #b43e00;
+  --diff-insane: #b0121c;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0b0f14;
-  --surface: #131a22;
-  --text: #d6dee6;
-  --muted: #94a1ae;
-  --accent: #5fd0a0;
-  --accent-contrast: #0b0f14;
-  --border: #243040;
-  --border-ui: #5f7186;
-  --focus: #7cc4ff;
-  --code-bg: #10161d;
-  --success: #6fd58f;
-  --warning: #e2b053;
-  --info: #7cc4ff;
-  --cat-web: #7cc4ff;
-  --cat-crypto: #c4a2f0;
-  --cat-pwn: #ff8a8f;
-  --cat-reverse: #e2b053;
-  --cat-forensic: #6fd58f;
-  --cat-osint: #5fd6d6;
-  --cat-misc: #94a1ae;
-  --diff-easy: #6fd58f;
-  --diff-medium: #e2b053;
-  --diff-hard: #ff8a8f;
-  --diff-insane: #c4a2f0;
+  --bg: #0c0c0e;
+  --surface: #151518;
+  --text: #e8e6e3;
+  --muted: #9e9da5;
+  --accent: #ff5a63;
+  --accent-contrast: #0c0c0e;
+  --highlight: #ffb04a;
+  --highlight-bg: #3d2611;
+  --border: #27272c;
+  --border-ui: #66656e;
+  --focus: #ffb04a;
+  --code-bg: #111114;
+  --success: #6fd69a;
+  --warning: #ffb04a;
+  --info: #82c0ff;
+  --cat-web: #82c0ff;
+  --cat-crypto: #c9a6f5;
+  --cat-pwn: #ff7a82;
+  --cat-reverse: #ffb04a;
+  --cat-forensic: #6fd69a;
+  --cat-osint: #6fd8d8;
+  --cat-misc: #9e9da5;
+  --diff-easy: #82c0ff;
+  --diff-medium: #f5c542;
+  --diff-hard: #ff8c42;
+  --diff-insane: #ff5a63;
 }
 
 @theme inline {
@@ -73,6 +81,8 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-contrast: var(--accent-contrast);
+  --color-highlight: var(--highlight);
+  --color-highlight-bg: var(--highlight-bg);
   --color-border: var(--border);
   --color-border-ui: var(--border-ui);
   --color-focus: var(--focus);
@@ -91,7 +101,7 @@
   --color-diff-medium: var(--diff-medium);
   --color-diff-hard: var(--diff-hard);
   --color-diff-insane: var(--diff-insane);
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
@@ -103,59 +113,138 @@
     font-size: 100%;
     line-height: 1.65;
     scroll-behavior: smooth;
+    scroll-padding-top: 1.5rem;
     -webkit-text-size-adjust: 100%;
+    font-kerning: normal;
   }
   body {
     min-width: 0;
     overflow-wrap: anywhere;
+    font-size: 1.0625rem;
+    text-rendering: optimizeLegibility;
   }
   a {
     color: var(--accent);
+    text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
   }
+  a:hover { text-decoration-thickness: 2px; }
+  h1, h2, h3, h4 { text-wrap: balance; line-height: 1.2; }
+  p { text-wrap: pretty; }
   code, kbd, samp, pre {
     font-family: var(--font-mono);
     font-weight: 400;
+    font-variant-ligatures: none;
   }
-  strong, b { font-weight: 700; }
-  ::selection { background: var(--accent); color: var(--accent-contrast); }
+  strong, b { font-weight: 600; }
+  mark { background: var(--highlight-bg); color: var(--text); padding: 0 0.15em; border-radius: 2px; }
+  ::selection { background: var(--highlight-bg); color: var(--text); }
   img, video, svg { max-width: 100%; height: auto; }
+  hr { border: 0; border-top: 1px solid var(--border); }
   pre {
     overflow-x: auto;
     max-width: 100%;
     background: var(--code-bg);
     color: var(--text);
     border: 1px solid var(--border);
-    padding: 0.875rem 1rem;
+    border-radius: 6px;
+    padding: 1rem 1.125rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
     overflow-wrap: normal;
+    tab-size: 2;
   }
   :not(pre) > code {
     background: var(--code-bg);
-    padding: 0.1em 0.35em;
-    border-radius: 0.25rem;
+    border: 1px solid var(--border);
+    padding: 0.05em 0.35em;
+    border-radius: 4px;
+    font-size: 0.875em;
   }
-  /* Tables: wrap in .table-wrap (or let the markdown pipeline do it) to scroll horizontally. */
   .table-wrap { overflow-x: auto; max-width: 100%; }
 
-  /* Never outline:none alone. Outline >= 2px, --focus >= 3:1 on bg and surface (see docs/contrast.md). */
+  /* Never outline:none alone. Outline >= 2px, --focus >= 3:1 on bg and surface (docs/contrast.md). */
   :focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
-/* Utility: min 24x24 target (WCAG 2.5.8) for nav links and buttons. */
+/* --- Components (shared by .astro markup and the DOM built in src/scripts). --- */
+@layer components {
+  .shell { width: 100%; max-width: 72rem; margin-inline: auto; padding-inline: 1.25rem; }
+  @media (min-width: 48rem) { .shell { padding-inline: 2rem; } }
+
+  /* Small mono label above headings and in metadata ("~/writeups", "ctf"). */
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border-ui);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn[hidden] { display: none; }
+  .btn-sm { min-height: 1.75rem; padding: 0 0.5rem; font-size: 0.75rem; }
+
+  /* Window bar above code blocks (copy-code.ts) and Terminal. */
+  .code-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.3rem 0.4rem 0.3rem 0.875rem;
+    border: 1px solid var(--border);
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .code-dots { display: inline-flex; gap: 0.35rem; margin-right: 0.5rem; }
+  .code-dots span { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--border-ui); opacity: 0.55; }
+  .code-block { margin-block: 1.75rem; }
+  .code-block pre { margin: 0; border-radius: 0 0 6px 6px; }
+
+  /* Redaction bar shown in place of a hidden flag. */
+  .redacted {
+    display: inline-block;
+    width: min(16rem, 60%);
+    height: 1.15em;
+    border-radius: 2px;
+    background: repeating-linear-gradient(135deg, var(--text) 0 10px, var(--muted) 10px 12px);
+  }
+  .redacted[hidden] { display: none; }
+
+  /* Log-style list rows (writeups, notes). */
+  .log { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+  .log > li { border-bottom: 1px solid var(--border); }
+}
+
 .target-min {
   display: inline-flex;
   align-items: center;
   min-width: 24px;
   min-height: 24px;
 }
-.target-min[hidden] {
-  display: none;
-}
+.target-min[hidden] { display: none; }
 
-/* Skip link: off-screen until focused. */
 .skip-link {
   position: absolute;
   left: 0.5rem;
@@ -177,10 +266,10 @@
   --tw-prose-links: var(--accent);
   --tw-prose-bold: var(--text);
   --tw-prose-counters: var(--muted);
-  --tw-prose-bullets: var(--muted);
+  --tw-prose-bullets: var(--accent);
   --tw-prose-hr: var(--border);
   --tw-prose-quotes: var(--text);
-  --tw-prose-quote-borders: var(--border-ui);
+  --tw-prose-quote-borders: var(--highlight);
   --tw-prose-captions: var(--muted);
   --tw-prose-kbd: var(--text);
   --tw-prose-kbd-shadows: var(--text);
@@ -189,15 +278,26 @@
   --tw-prose-pre-bg: var(--code-bg);
   --tw-prose-th-borders: var(--border-ui);
   --tw-prose-td-borders: var(--border);
-  max-width: 70ch;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  max-width: 68ch;
 }
 .prose :where(code):not(:where(pre *))::before,
 .prose :where(code):not(:where(pre *))::after { content: none; }
-.prose :where(h1, h2, h3, h4) { font-weight: 700; letter-spacing: -0.01em; }
-.prose :where(table) { display: block; overflow-x: auto; max-width: 100%; }
+.prose :where(code):not(:where(pre *)) { font-weight: 400; }
+.prose :where(h2, h3, h4) { font-weight: 600; letter-spacing: -0.01em; scroll-margin-top: 1.5rem; }
+.prose :where(h2) { font-size: 1.5rem; margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+.prose :where(h3) { font-size: 1.1875rem; }
+/* Markdown-style markers; the "/ ''" alt text keeps them out of the accessibility tree. */
+.prose :where(h2)::before { content: "## " / ""; font-family: var(--font-mono); font-weight: 400; color: var(--accent); }
+.prose :where(h3)::before { content: "### " / ""; font-family: var(--font-mono); font-weight: 400; color: var(--muted); }
+.prose :where(a) { font-weight: 500; text-decoration-thickness: 1px; }
+.prose :where(blockquote) { font-style: normal; font-weight: 400; background: var(--surface); padding: 0.75rem 1.25rem; border-radius: 0 6px 6px 0; }
+.prose :where(blockquote p)::before, .prose :where(blockquote p)::after { content: none; }
+.prose :where(table) { display: block; overflow-x: auto; max-width: 100%; font-size: 0.9375rem; }
+.prose :where(ul > li)::marker { content: "› "; font-family: var(--font-mono); }
 
-/* --- Shiki switching block. Names assumed: --shiki-light, --shiki-light-bg, --shiki-dark,
-   --shiki-dark-bg (set by classes from the Shiki task). Adjust here if they differ. --- */
+/* --- Shiki (classes from src/integrations/shiki-css.mjs set --shiki-light/-dark[-bg]). --- */
 .astro-code,
 .astro-code span {
   color: var(--shiki-light);
@@ -208,7 +308,6 @@
   color: var(--shiki-dark);
   background-color: var(--shiki-dark-bg);
 }
-/* --- end Shiki block --- */
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

@@ -56,6 +56,6 @@ export const securityTxt = {
 
 // Placeholders: T3 finalizes these.
 export const themeColors = {
-  light: '#faf8f3',
-  dark: '#0b0f14',
+  light: '#f7f6f3',
+  dark: '#0c0c0e',
 } as const;

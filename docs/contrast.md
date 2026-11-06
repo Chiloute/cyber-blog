@@ -8,66 +8,95 @@ Badges carry text; color is only a supplement. Syntax highlighting is checked se
 
 | Pair | Foreground | Background | Ratio | Required | Pass |
 |---|---|---|---|---|---|
-| text / bg | `#1c1b19` | `#faf8f3` | 16.22 | 4.5 | yes |
-| muted / bg | `#5a564d` | `#faf8f3` | 6.89 | 4.5 | yes |
-| text / surface | `#1c1b19` | `#f0ece2` | 14.59 | 4.5 | yes |
-| muted / surface | `#5a564d` | `#f0ece2` | 6.20 | 4.5 | yes |
-| accent (links) / bg | `#0b5a87` | `#faf8f3` | 7.00 | 4.5 | yes |
-| accent (links) / surface | `#0b5a87` | `#f0ece2` | 6.30 | 4.5 | yes |
-| accent-contrast / accent (buttons) | `#ffffff` | `#0b5a87` | 7.43 | 4.5 | yes |
-| focus / bg | `#0b5a87` | `#faf8f3` | 7.00 | 3 | yes |
-| focus / surface | `#0b5a87` | `#f0ece2` | 6.30 | 3 | yes |
-| border-ui / bg (inputs, buttons) | `#787265` | `#faf8f3` | 4.50 | 3 | yes |
-| text / code-bg | `#1c1b19` | `#ebe6da` | 13.82 | 4.5 | yes |
-| muted / code-bg | `#5a564d` | `#ebe6da` | 5.87 | 4.5 | yes |
-| callout success / surface | `#1c6638` | `#f0ece2` | 5.92 | 4.5 | yes |
-| callout warning / surface | `#85500a` | `#f0ece2` | 5.65 | 4.5 | yes |
-| callout info / surface | `#0b5a87` | `#f0ece2` | 6.30 | 4.5 | yes |
-| callout text / surface | `#1c1b19` | `#f0ece2` | 14.59 | 4.5 | yes |
-| badge cat-web / surface | `#0b5a87` | `#f0ece2` | 6.30 | 4.5 | yes |
-| badge cat-crypto / surface | `#6a3d9a` | `#f0ece2` | 6.48 | 4.5 | yes |
-| badge cat-pwn / surface | `#a1262b` | `#f0ece2` | 6.30 | 4.5 | yes |
-| badge cat-reverse / surface | `#85500a` | `#f0ece2` | 5.65 | 4.5 | yes |
-| badge cat-forensic / surface | `#1c6638` | `#f0ece2` | 5.92 | 4.5 | yes |
-| badge cat-osint / surface | `#006b6b` | `#f0ece2` | 5.37 | 4.5 | yes |
-| badge cat-misc / surface | `#5a564d` | `#f0ece2` | 6.20 | 4.5 | yes |
-| badge diff-easy / surface | `#1c6638` | `#f0ece2` | 5.92 | 4.5 | yes |
-| badge diff-medium / surface | `#85500a` | `#f0ece2` | 5.65 | 4.5 | yes |
-| badge diff-hard / surface | `#a1262b` | `#f0ece2` | 6.30 | 4.5 | yes |
-| badge diff-insane / surface | `#6a3d9a` | `#f0ece2` | 6.48 | 4.5 | yes |
+| text / bg | `#18181b` | `#f7f6f3` | 16.39 | 4.5 | yes |
+| muted / bg | `#55555d` | `#f7f6f3` | 6.83 | 4.5 | yes |
+| text / surface | `#18181b` | `#ecebe7` | 14.85 | 4.5 | yes |
+| muted / surface | `#55555d` | `#ecebe7` | 6.19 | 4.5 | yes |
+| accent (links) / bg | `#b0121c` | `#f7f6f3` | 6.59 | 4.5 | yes |
+| accent (links) / surface | `#b0121c` | `#ecebe7` | 5.97 | 4.5 | yes |
+| accent-contrast / accent (buttons) | `#ffffff` | `#b0121c` | 7.12 | 4.5 | yes |
+| focus / bg | `#954300` | `#f7f6f3` | 6.31 | 3 | yes |
+| focus / surface | `#954300` | `#ecebe7` | 5.71 | 3 | yes |
+| border-ui / bg (inputs, buttons) | `#76757d` | `#f7f6f3` | 4.21 | 3 | yes |
+| highlight (active nav) / bg | `#954300` | `#f7f6f3` | 6.31 | 4.5 | yes |
+| highlight / surface | `#954300` | `#ecebe7` | 5.71 | 4.5 | yes |
+| text / highlight-bg (mark, selection) | `#18181b` | `#f6dfc9` | 13.77 | 4.5 | yes |
+| accent (links) / code-bg | `#b0121c` | `#eae8e3` | 5.82 | 4.5 | yes |
+| badge cat-web / bg | `#1d5a8a` | `#f7f6f3` | 6.74 | 4.5 | yes |
+| badge cat-crypto / bg | `#6a3d9e` | `#f7f6f3` | 7.00 | 4.5 | yes |
+| badge cat-pwn / bg | `#b0121c` | `#f7f6f3` | 6.59 | 4.5 | yes |
+| badge cat-reverse / bg | `#8a4a00` | `#f7f6f3` | 6.35 | 4.5 | yes |
+| badge cat-forensic / bg | `#1b673a` | `#f7f6f3` | 6.38 | 4.5 | yes |
+| badge cat-osint / bg | `#00676a` | `#f7f6f3` | 6.17 | 4.5 | yes |
+| badge cat-misc / bg | `#55555d` | `#f7f6f3` | 6.83 | 4.5 | yes |
+| badge diff-easy / bg | `#1d5a8a` | `#f7f6f3` | 6.74 | 4.5 | yes |
+| badge diff-medium / bg | `#8a5a00` | `#f7f6f3` | 5.48 | 4.5 | yes |
+| badge diff-hard / bg | `#b43e00` | `#f7f6f3` | 5.35 | 4.5 | yes |
+| badge diff-insane / bg | `#b0121c` | `#f7f6f3` | 6.59 | 4.5 | yes |
+| text / code-bg | `#18181b` | `#eae8e3` | 14.47 | 4.5 | yes |
+| muted / code-bg | `#55555d` | `#eae8e3` | 6.03 | 4.5 | yes |
+| callout success / surface | `#1b673a` | `#ecebe7` | 5.78 | 4.5 | yes |
+| callout warning / surface | `#8a4a00` | `#ecebe7` | 5.75 | 4.5 | yes |
+| callout info / surface | `#1d5a8a` | `#ecebe7` | 6.11 | 4.5 | yes |
+| callout text / surface | `#18181b` | `#ecebe7` | 14.85 | 4.5 | yes |
+| badge cat-web / surface | `#1d5a8a` | `#ecebe7` | 6.11 | 4.5 | yes |
+| badge cat-crypto / surface | `#6a3d9e` | `#ecebe7` | 6.35 | 4.5 | yes |
+| badge cat-pwn / surface | `#b0121c` | `#ecebe7` | 5.97 | 4.5 | yes |
+| badge cat-reverse / surface | `#8a4a00` | `#ecebe7` | 5.75 | 4.5 | yes |
+| badge cat-forensic / surface | `#1b673a` | `#ecebe7` | 5.78 | 4.5 | yes |
+| badge cat-osint / surface | `#00676a` | `#ecebe7` | 5.59 | 4.5 | yes |
+| badge cat-misc / surface | `#55555d` | `#ecebe7` | 6.19 | 4.5 | yes |
+| badge diff-easy / surface | `#1d5a8a` | `#ecebe7` | 6.11 | 4.5 | yes |
+| badge diff-medium / surface | `#8a5a00` | `#ecebe7` | 4.97 | 4.5 | yes |
+| badge diff-hard / surface | `#b43e00` | `#ecebe7` | 4.85 | 4.5 | yes |
+| badge diff-insane / surface | `#b0121c` | `#ecebe7` | 5.97 | 4.5 | yes |
 
 ## Dark theme
 
 | Pair | Foreground | Background | Ratio | Required | Pass |
 |---|---|---|---|---|---|
-| text / bg | `#d6dee6` | `#0b0f14` | 14.14 | 4.5 | yes |
-| muted / bg | `#94a1ae` | `#0b0f14` | 7.29 | 4.5 | yes |
-| text / surface | `#d6dee6` | `#131a22` | 12.89 | 4.5 | yes |
-| muted / surface | `#94a1ae` | `#131a22` | 6.65 | 4.5 | yes |
-| accent (links) / bg | `#5fd0a0` | `#0b0f14` | 10.08 | 4.5 | yes |
-| accent (links) / surface | `#5fd0a0` | `#131a22` | 9.19 | 4.5 | yes |
-| accent-contrast / accent (buttons) | `#0b0f14` | `#5fd0a0` | 10.08 | 4.5 | yes |
-| focus / bg | `#7cc4ff` | `#0b0f14` | 10.25 | 3 | yes |
-| focus / surface | `#7cc4ff` | `#131a22` | 9.34 | 3 | yes |
-| border-ui / bg (inputs, buttons) | `#5f7186` | `#0b0f14` | 3.84 | 3 | yes |
-| text / code-bg | `#d6dee6` | `#10161d` | 13.38 | 4.5 | yes |
-| muted / code-bg | `#94a1ae` | `#10161d` | 6.90 | 4.5 | yes |
-| callout success / surface | `#6fd58f` | `#131a22` | 9.67 | 4.5 | yes |
-| callout warning / surface | `#e2b053` | `#131a22` | 8.82 | 4.5 | yes |
-| callout info / surface | `#7cc4ff` | `#131a22` | 9.34 | 4.5 | yes |
-| callout text / surface | `#d6dee6` | `#131a22` | 12.89 | 4.5 | yes |
-| badge cat-web / surface | `#7cc4ff` | `#131a22` | 9.34 | 4.5 | yes |
-| badge cat-crypto / surface | `#c4a2f0` | `#131a22` | 8.15 | 4.5 | yes |
-| badge cat-pwn / surface | `#ff8a8f` | `#131a22` | 7.75 | 4.5 | yes |
-| badge cat-reverse / surface | `#e2b053` | `#131a22` | 8.82 | 4.5 | yes |
-| badge cat-forensic / surface | `#6fd58f` | `#131a22` | 9.67 | 4.5 | yes |
-| badge cat-osint / surface | `#5fd6d6` | `#131a22` | 10.08 | 4.5 | yes |
-| badge cat-misc / surface | `#94a1ae` | `#131a22` | 6.65 | 4.5 | yes |
-| badge diff-easy / surface | `#6fd58f` | `#131a22` | 9.67 | 4.5 | yes |
-| badge diff-medium / surface | `#e2b053` | `#131a22` | 8.82 | 4.5 | yes |
-| badge diff-hard / surface | `#ff8a8f` | `#131a22` | 7.75 | 4.5 | yes |
-| badge diff-insane / surface | `#c4a2f0` | `#131a22` | 8.15 | 4.5 | yes |
-
+| text / bg | `#e8e6e3` | `#0c0c0e` | 15.69 | 4.5 | yes |
+| muted / bg | `#9e9da5` | `#0c0c0e` | 7.28 | 4.5 | yes |
+| text / surface | `#e8e6e3` | `#151518` | 14.63 | 4.5 | yes |
+| muted / surface | `#9e9da5` | `#151518` | 6.79 | 4.5 | yes |
+| accent (links) / bg | `#ff5a63` | `#0c0c0e` | 6.42 | 4.5 | yes |
+| accent (links) / surface | `#ff5a63` | `#151518` | 5.98 | 4.5 | yes |
+| accent-contrast / accent (buttons) | `#0c0c0e` | `#ff5a63` | 6.42 | 4.5 | yes |
+| focus / bg | `#ffb04a` | `#0c0c0e` | 10.76 | 3 | yes |
+| focus / surface | `#ffb04a` | `#151518` | 10.03 | 3 | yes |
+| border-ui / bg (inputs, buttons) | `#66656e` | `#0c0c0e` | 3.40 | 3 | yes |
+| highlight (active nav) / bg | `#ffb04a` | `#0c0c0e` | 10.76 | 4.5 | yes |
+| highlight / surface | `#ffb04a` | `#151518` | 10.03 | 4.5 | yes |
+| text / highlight-bg (mark, selection) | `#e8e6e3` | `#3d2611` | 11.36 | 4.5 | yes |
+| accent (links) / code-bg | `#ff5a63` | `#111114` | 6.19 | 4.5 | yes |
+| badge cat-web / bg | `#82c0ff` | `#0c0c0e` | 10.17 | 4.5 | yes |
+| badge cat-crypto / bg | `#c9a6f5` | `#0c0c0e` | 9.54 | 4.5 | yes |
+| badge cat-pwn / bg | `#ff7a82` | `#0c0c0e` | 7.78 | 4.5 | yes |
+| badge cat-reverse / bg | `#ffb04a` | `#0c0c0e` | 10.76 | 4.5 | yes |
+| badge cat-forensic / bg | `#6fd69a` | `#0c0c0e` | 10.95 | 4.5 | yes |
+| badge cat-osint / bg | `#6fd8d8` | `#0c0c0e` | 11.62 | 4.5 | yes |
+| badge cat-misc / bg | `#9e9da5` | `#0c0c0e` | 7.28 | 4.5 | yes |
+| badge diff-easy / bg | `#82c0ff` | `#0c0c0e` | 10.17 | 4.5 | yes |
+| badge diff-medium / bg | `#f5c542` | `#0c0c0e` | 12.05 | 4.5 | yes |
+| badge diff-hard / bg | `#ff8c42` | `#0c0c0e` | 8.45 | 4.5 | yes |
+| badge diff-insane / bg | `#ff5a63` | `#0c0c0e` | 6.42 | 4.5 | yes |
+| text / code-bg | `#e8e6e3` | `#111114` | 15.13 | 4.5 | yes |
+| muted / code-bg | `#9e9da5` | `#111114` | 7.02 | 4.5 | yes |
+| callout success / surface | `#6fd69a` | `#151518` | 10.21 | 4.5 | yes |
+| callout warning / surface | `#ffb04a` | `#151518` | 10.03 | 4.5 | yes |
+| callout info / surface | `#82c0ff` | `#151518` | 9.49 | 4.5 | yes |
+| callout text / surface | `#e8e6e3` | `#151518` | 14.63 | 4.5 | yes |
+| badge cat-web / surface | `#82c0ff` | `#151518` | 9.49 | 4.5 | yes |
+| badge cat-crypto / surface | `#c9a6f5` | `#151518` | 8.90 | 4.5 | yes |
+| badge cat-pwn / surface | `#ff7a82` | `#151518` | 7.25 | 4.5 | yes |
+| badge cat-reverse / surface | `#ffb04a` | `#151518` | 10.03 | 4.5 | yes |
+| badge cat-forensic / surface | `#6fd69a` | `#151518` | 10.21 | 4.5 | yes |
+| badge cat-osint / surface | `#6fd8d8` | `#151518` | 10.84 | 4.5 | yes |
+| badge cat-misc / surface | `#9e9da5` | `#151518` | 6.79 | 4.5 | yes |
+| badge diff-easy / surface | `#82c0ff` | `#151518` | 9.49 | 4.5 | yes |
+| badge diff-medium / surface | `#f5c542` | `#151518` | 11.24 | 4.5 | yes |
+| badge diff-hard / surface | `#ff8c42` | `#151518` | 7.88 | 4.5 | yes |
+| badge diff-insane / surface | `#ff5a63` | `#151518` | 5.98 | 4.5 | yes |
 
 ## Syntax highlighting
 
