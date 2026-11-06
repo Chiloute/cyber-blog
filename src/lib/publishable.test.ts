@@ -29,3 +29,8 @@ test('no fields is publishable', () => {
 test('draft false with publishAfter in the future is not publishable', () => {
   assert.equal(isPublishable({ draft: false, publishAfter: future }, now), false);
 });
+
+test('includeDrafts lifts the draft flag but never the embargo', () => {
+  assert.equal(isPublishable({ draft: true }, now, true), true);
+  assert.equal(isPublishable({ draft: true, publishAfter: future }, now, true), false);
+});

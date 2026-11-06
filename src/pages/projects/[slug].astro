@@ -3,10 +3,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { getProjects } from '../../lib/github.ts';
+import { showDrafts } from '../../lib/publishable.ts';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const [projects, entries] = await Promise.all([getProjects(), getCollection('projects')]);
+  const [projects, entries] = await Promise.all([getProjects(), getCollection('projects', (e) => showDrafts() || !e.data.draft)]);
   return entries.flatMap((entry) => {
     const project = projects.find((p) => p.slug === entry.id);
     return project ? [{ params: { slug: entry.id }, props: { entry, project } }] : [];

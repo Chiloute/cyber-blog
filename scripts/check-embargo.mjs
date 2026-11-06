@@ -21,7 +21,7 @@ function field(fm, key) {
 const now = new Date();
 const needles = new Set(CANARIES);
 const blocked = [];
-for (const dir of ['writeups', 'notes']) {
+for (const dir of ['writeups', 'notes', 'projects']) {
   const base = join('src/content', dir);
   if (!existsSync(base)) continue;
   for (const f of readdirSync(base).filter((n) => n.endsWith('.mdx'))) {
@@ -31,7 +31,8 @@ for (const dir of ['writeups', 'notes']) {
       const slug = basename(f, '.mdx');
       const title = field(fm, 'title');
       blocked.push(`${dir}/${slug}`);
-      needles.add(slug);
+      // A project slug is also its repo name, legitimately shown on the GitHub card: match its page URL instead.
+      needles.add(dir === 'projects' ? `/projects/${slug}/` : slug);
       if (title) needles.add(title);
     }
   }

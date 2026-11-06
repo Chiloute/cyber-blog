@@ -48,6 +48,7 @@ const projects = defineCollection({
   schema: ({ image }) =>
     z.object({
       repo: z.string().regex(/^[\w.-]+\/[\w.-]+$/, 'expected "owner/name"'),
+      draft: z.boolean().default(false),
       title: z.string().optional(),
       demo: z.url().optional(),
       cover: cover(image).optional(),
