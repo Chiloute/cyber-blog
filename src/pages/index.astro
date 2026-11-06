@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPublished } from '../lib/publishable.ts';
+import { getProjects } from '../lib/github.ts';
+import { readingMinutes } from '../lib/reading-time.ts';
+import { formatDate, isoDate } from '../lib/dates.ts';
+
+const writeups = (await getPublished('writeups')).slice(0, 3);
+const notes = (await getPublished('notes')).slice(0, 3);
+const projects = (await getProjects()).slice(0, 3);
+const more = 'inline-block py-2 text-accent underline';
+---
+<BaseLayout title="chiloute" description="Security notes, CTF writeups and projects.">
+  <h1 class="text-4xl font-bold"><span aria-hidden="true" class="font-mono text-muted">$ whoami<br /></span>chiloute</h1>
+  <p class="mt-2 font-mono text-lg text-muted">Security notes, CTF writeups and projects</p>
+  <p class="mt-4 max-w-prose">
+    {/* TODO: personalise the intro */}
+    Welcome. I write up CTF challenges, keep short security notes and build small tools. Everything here is meant to be read slowly and reproduced.
+  </p>
+
+  <section aria-labelledby="h-writeups" class="mt-10">
+    <h2 id="h-writeups" class="text-2xl font-bold">Latest writeups</h2>
+    {writeups.length === 0 ? <p class="mt-4">No writeups published yet.</p> : (
+      <ul class="mt-4 list-none space-y-4 p-0">
+        {writeups.map((e) => (
+          <PostCard
+            href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+            readingMinutes={readingMinutes(e.body ?? '')} category={e.data.category} difficulty={e.data.difficulty}
+            ctf={e.data.ctf} tags={e.data.tags}
+          />
+        ))}
+      </ul>
+    )}
+    <p class="mt-2"><a href="/writeups/" class={more}>All writeups</a></p>
+  </section>
+
+  <section aria-labelledby="h-notes" class="mt-10">
+    <h2 id="h-notes" class="text-2xl font-bold">Latest notes</h2>
+    {notes.length === 0 ? <p class="mt-4">No notes published yet.</p> : (
+      <ul class="mt-4 list-none space-y-4 p-0">
+        {notes.map((e) => (
+          <li>
+            <article class="rounded border border-border p-4">
+              <h3 class="m-0 text-xl font-bold"><a href={`/notes/${e.id}/`} class="text-accent underline">{e.data.title}</a></h3>
+              <p class="mt-1 text-sm text-muted"><time datetime={isoDate(e.data.date)}>{formatDate(e.data.date)}</time></p>
+              <p class="mt-2">{e.data.description}</p>
+            </article>
+          </li>
+        ))}
+      </ul>
+    )}
+    <p class="mt-2"><a href="/notes/" class={more}>All notes</a></p>
+  </section>
+
+  <section aria-labelledby="h-projects" class="mt-10">
+    <h2 id="h-projects" class="text-2xl font-bold">Featured projects</h2>
+    {projects.length === 0 ? <p class="mt-4">No projects to show yet.</p> : (
+      <ul class="mt-4 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        {projects.map((p) => <li><ProjectCard project={p} level={3} /></li>)}
+      </ul>
+    )}
+    <p class="mt-2"><a href="/projects/" class={more}>All projects</a></p>
+  </section>
+</BaseLayout>
