@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Search" description="Search writeups, notes and projects." noindex pagefindBody={false}>
+  <h1>Search</h1>
+  <form id="search-form" role="search" aria-label="Site search" class="my-6 flex flex-wrap items-end gap-3">
+    <div class="flex grow flex-col gap-1">
+      <label for="search-input">Search writeups, notes and projects</label>
+      <input id="search-input" name="q" type="search" autocomplete="off" class="target-min w-full border border-(--border) bg-transparent px-3" />
+    </div>
+    <button type="submit" class="target-min border border-(--border) px-4">Search</button>
+  </form>
+  <div id="search-status" role="status" aria-live="polite"></div>
+  <ol id="search-results" class="mt-4 space-y-6 list-none p-0"></ol>
+  <noscript>
+    <p>Search requires JavaScript. Browse <a href="/writeups">writeups</a> and <a href="/notes">notes</a> instead.</p>
+  </noscript>
+  <script>
+    import '../scripts/search.ts';
+  </script>
+</BaseLayout>
