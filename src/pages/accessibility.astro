@@ -1,6 +1,9 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
 import ContactEmail from '../components/ContactEmail.astro';
+import { formatDate } from '../lib/dates.ts';
+
+const written = '2026-11-06';
 ---
 
 <LegalLayout title="Accessibility statement" description="Accessibility target, status, testing methods and known limitations of this site." updated="2026-11-06">
@@ -36,5 +39,5 @@ import ContactEmail from '../components/ContactEmail.astro';
   </p>
 
   <h2>Date</h2>
-  <p>This statement was written on <time datetime="2026-11-06">2026-11-06</time>.</p>
+  <p>This statement was written on <time datetime={written}>{formatDate(new Date(written))}</time>.</p>
 </LegalLayout>

@@ -1,24 +1,25 @@
 ---
 import MobileNav from './MobileNav.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import Prompt from './Prompt.astro';
 
 const links = [
-  ['writeups', '/writeups'],
-  ['notes', '/notes'],
-  ['projects', '/projects'],
-  ['about', '/about'],
-  ['search', '/search'],
+  ['writeups', '/writeups/'],
+  ['notes', '/notes/'],
+  ['projects', '/projects/'],
+  ['about', '/about/'],
+  ['search', '/search/'],
 ] as const;
 const path = Astro.url.pathname;
-const active = (href: string) => path === href || path.startsWith(href + '/');
+const active = (href: string) => path.startsWith(href);
 // Prompt path follows the current section: chiloute@redteam:~/writeups$
-const section = links.find(([, href]) => active(href))?.[1] ?? '';
+const section = links.find(([, href]) => active(href))?.[1].slice(0, -1) ?? '';
 ---
 
 <header class="border-b border-border bg-bg">
   <div class="shell flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
     <a href="/" class="target-min mr-auto font-mono text-[0.9375rem] font-bold text-text no-underline">
-      <span class="text-accent">chiloute</span><span aria-hidden="true" class="font-normal text-muted">@redteam:<span class="text-highlight">~{section}</span>$</span><span class="sr-only">, home</span>
+      <Prompt section={section} /><span class="sr-only">, home</span>
     </a>
     <MobileNav controls="main-nav-list" />
     <nav aria-label="Main" class="order-last w-full md:order-none md:w-auto">

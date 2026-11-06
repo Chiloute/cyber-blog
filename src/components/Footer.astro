@@ -1,42 +1,44 @@
 ---
 import ContactEmail from './ContactEmail.astro';
 import ExternalLink from './ExternalLink.astro';
+import Prompt from './Prompt.astro';
 import { AUTHOR, licenses } from '../config/site.ts';
 
+// Same vocabulary as the header: ~/group, ./slug links.
 const groups = [
-  ['Read', [['Writeups', '/writeups/'], ['Notes', '/notes/'], ['Projects', '/projects/'], ['About', '/about/']]],
-  ['Site', [['Legal notice', '/legal-notice/'], ['Privacy', '/privacy/'], ['Accessibility', '/accessibility/'], ['Disclaimer', '/disclaimer/'], ['Licenses', '/licenses/']]],
-  ['Feeds & security', [['RSS feed', '/rss.xml'], ['security.txt', '/.well-known/security.txt'], ['PGP key', '/pgp-key.txt']]],
+  ['read', [['writeups', '/writeups/'], ['notes', '/notes/'], ['projects', '/projects/'], ['about', '/about/']]],
+  ['site', [['legal-notice', '/legal-notice/'], ['privacy', '/privacy/'], ['accessibility', '/accessibility/'], ['disclaimer', '/disclaimer/'], ['licenses', '/licenses/']]],
+  ['feeds', [['rss.xml', '/rss.xml'], ['security.txt', '/.well-known/security.txt'], ['pgp-key.txt', '/pgp-key.txt']]],
 ] as const;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const link = 'target-min text-text no-underline hover:text-accent hover:underline';
 ---
 
-<footer class="mt-20 border-t border-border bg-surface text-sm">
-  <!-- Status line: report-style TLP marking (public content) + decorative mirror of the current path. -->
-  <div aria-hidden="true" class="flex border-b border-border font-mono text-xs">
-    <span class="bg-text px-3 py-1 font-bold tracking-wider text-bg">TLP:CLEAR</span>
-    <span class="truncate px-3 py-1 text-muted">~{path === '/' ? '' : path}</span>
-    <span class="ml-auto hidden px-3 py-1 text-muted sm:inline">utf-8 · en · {new Date().getFullYear()}</span>
-  </div>
-  <div class="shell grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-    <div class="space-y-2">
-      <p class="m-0 font-mono font-bold text-text">chiloute<span class="text-accent">@redteam</span></p>
-      <p class="m-0 max-w-[32ch] text-muted">Security notes, CTF writeups and small tools. No trackers, no cookies.</p>
-      <p class="m-0">Contact: <ContactEmail /></p>
+<footer class="mt-20 border-t border-border text-sm">
+  <div class="shell grid grid-cols-2 gap-8 py-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <div class="col-span-2 space-y-2 lg:col-span-1">
+      <p class="m-0 font-mono text-[0.9375rem] font-bold"><Prompt /></p>
+      <p class="m-0 max-w-[34ch] text-muted">Security notes, CTF writeups and small tools. No trackers, no cookies.</p>
+      <p class="m-0"><span class="kicker">contact</span> <ContactEmail /></p>
     </div>
     {groups.map(([title, links]) => (
-      <nav aria-label={title}>
-        <p class="kicker m-0 mb-2">{title}</p>
-        <ul class="m-0 list-none space-y-0.5 p-0">
-          {links.map(([label, href]) => <li><a href={href} class="target-min text-text no-underline hover:text-accent hover:underline">{label}</a></li>)}
+      <nav aria-label={title[0]!.toUpperCase() + title.slice(1)}>
+        <p class="kicker m-0 mb-2" aria-hidden="true">~/{title}</p>
+        <ul class="m-0 list-none space-y-0.5 p-0 font-mono text-[0.8125rem]">
+          {links.map(([label, href]) => <li><a href={href} class={link}><span aria-hidden="true" class="text-muted">./</span>{label}</a></li>)}
         </ul>
       </nav>
     ))}
   </div>
-  <div class="shell flex flex-wrap justify-between gap-2 border-t border-border py-4 text-muted">
-    <p class="m-0">© {new Date().getFullYear()} {AUTHOR}</p>
-    <p class="m-0">
-      Content <ExternalLink href={licenses.content.url} newTab>{licenses.content.name}</ExternalLink> · Code {licenses.code.name}
-    </p>
+  <!-- Status line, inside the column like every other element: TLP marking + current path (decorative), then copyright and licenses.
+       Extra bottom padding on mobile keeps the last links clear of the fixed .to-top button. -->
+  <div class="shell">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border pt-4 pb-16 font-mono text-xs text-muted md:pb-4">
+      <span aria-hidden="true" class="rounded-sm bg-text px-1.5 py-0.5 font-bold tracking-wider text-bg">TLP:CLEAR</span>
+      <span aria-hidden="true" class="truncate">~{path === '/' ? '' : path}</span>
+      <p class="m-0 sm:ml-auto">
+        © {new Date().getFullYear()} {AUTHOR} · content <ExternalLink href={licenses.content.url} newTab>{licenses.content.name}</ExternalLink> · code {licenses.code.name}
+      </p>
+    </div>
   </div>
 </footer>

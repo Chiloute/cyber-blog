@@ -14,10 +14,11 @@ const list = document.querySelector<HTMLOListElement>('#search-results')!;
 const MAX = 20;
 
 let pf: Promise<Pf> | undefined;
+let ready = false;
 function load(): Promise<Pf> {
   // Variable path: Vite must not bundle the generated index.
   const path = '/pagefind/pagefind.js';
-  return (pf ??= import(/* @vite-ignore */ path).then(async (m: Pf) => { await m.init(); return m; }));
+  return (pf ??= import(/* @vite-ignore */ path).then(async (m: Pf) => { await m.init(); ready = true; return m; }));
 }
 
 function excerptNodes(html: string): Node[] {
@@ -41,14 +42,26 @@ function say(msg: string, error = false) {
   live.classList.toggle('text-warning', error);
 }
 
+// The query lives in ?q= so results can be shared, bookmarked and restored.
+function syncUrl(q: string) {
+  const url = new URL(location.href);
+  if (q) url.searchParams.set('q', q);
+  else url.searchParams.delete('q');
+  history.replaceState(null, '', url);
+}
+
 async function run(q: string, immediate: boolean) {
   q = q.trim();
+  syncUrl(q);
   if (!q) { list.replaceChildren(); say(''); return; }
+  // Only the first query waits for the index (WASM); later ones are near-instant, so stay quiet.
+  if (!ready) say('Searching…');
   try {
     const api = await load();
     const res = immediate ? await api.search(q) : await api.debouncedSearch(q, {}, 300);
     if (!res) return; // superseded by a newer keystroke
     const items = await Promise.all(res.results.slice(0, MAX).map((r) => r.data()));
+    if (input.value.trim() !== q) return; // input changed (e.g. cleared) while this search ran
     list.replaceChildren(...items.map((d) => {
       const a = document.createElement('a');
       a.href = d.url;
@@ -72,7 +85,7 @@ async function run(q: string, immediate: boolean) {
   } catch {
     pf = undefined;
     list.replaceChildren();
-    say('Search is unavailable: the search index could not be loaded. Build the site to generate it.', true);
+    say('Search is unavailable right now. Try again later, or browse the writeups and notes pages.', true);
   }
 }
 

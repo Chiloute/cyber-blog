@@ -62,7 +62,7 @@ const dd = 'm-0 text-[0.9375rem]';
         {w?.team && <div><dt class={dt}>Team</dt><dd class={dd}>{w.team}</dd></div>}
         <div><dt class={dt}>Published</dt><dd class={dd}><time datetime={isoDate(p.date)}>{formatDate(p.date)}</time></dd></div>
         {p.updated && <div><dt class={dt}>Updated</dt><dd class={dd}><time datetime={isoDate(p.updated)}>{formatDate(p.updated)}</time></dd></div>}
-        <div><dt class={dt}>Reading time</dt><dd class={dd}>{p.readingMinutes} min</dd></div>
+        <div><dt class={dt}>Reading time</dt><dd class={dd}>{p.readingMinutes}&nbsp;min</dd></div>
       </dl>
       {p.tags.length > 0 && (
         <ul aria-label="Tags" class="m-0 mt-4 flex list-none flex-wrap gap-2 p-0 font-mono text-xs">

@@ -8,10 +8,10 @@ const fallback = `${user} [at] ${domain.replaceAll('.', ' [dot] ')}`;
 
 {
   isEmailPlaceholder() ? (
-    <span>Contact address coming soon</span>
+    <span>address coming soon</span>
   ) : (
     <>
-      <span data-email data-u={rev(user)} data-d={rev(domain)}>{fallback}</span>
+      <span data-email translate="no" data-u={rev(user)} data-d={rev(domain)}>{fallback}</span>
       <script>
         import '../scripts/email.ts';
       </script>

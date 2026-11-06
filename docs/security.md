@@ -1,12 +1,12 @@
 # Security and cache policy
 
-This document explains every security and cache directive the site sends, why it is there, and how to reproduce it on Vercel and Nginx. Production is self-hosted behind nginx (see the Nginx section and the README Deployment section). The reference configuration is `public/_headers` and `public/_redirects`, which both Cloudflare Pages and Netlify read natively. Astro copies `public/` verbatim into `dist/`.
+This document explains every security and cache directive the site sends and why it is there. Production is self-hosted behind nginx (README, Deployment). The headers live in one place: `serverBlock` in `flake.nix` (see Production configuration).
 
 ## Threat model
 
 - The site is a static build (`output: 'static'`). There is no backend, no database, no user accounts, no forms that store data, and no server-side rendering at request time.
 - The main risks are therefore: script injection through a compromised dependency or a content mistake, clickjacking, data leaks through `Referer` or cross-origin reads, and supply-chain compromise of build dependencies or CI.
-- A build-time secret (`GITHUB_TOKEN`) is the only credential. It must never reach the browser (see Secrets).
+- The build uses no credential: project data comes from `src/data/projects.json`, and the production build runs offline.
 - Out of scope: server-side attacks, since there is no server code. The host's own security is outside this repository.
 
 ## Content Security Policy (CSP)
@@ -23,7 +23,7 @@ The policy is split across two places on purpose.
 
 Why there is no `'unsafe-inline'` and no `style=""` in the HTML: hashes cover `<script>` and `<style>` elements, but not `style` attributes. Shiki's default dual-theme output puts `style="--shiki-light:…"` attributes on every token, which the hashed `style-src` would block. `src/integrations/shiki-css.mjs` applies `transformerStyleToClass`, which moves those values into classes (`sh-<hash>`) in a stylesheet served from `/shiki.css`. That file is linked from `'self'`, so `style-src 'self'` covers it. The result is no inline styles and no `unsafe-inline` anywhere.
 
-**Header CSP (sent by the host).** A `<meta>` CSP cannot carry `frame-ancestors`, `report-uri`, or `sandbox`. So `public/_headers` sends a second policy as an HTTP header. Browsers enforce both policies, and a resource is allowed only if both allow it (intersection).
+**Header CSP (sent by nginx).** A `<meta>` CSP cannot carry `frame-ancestors`, `report-uri`, or `sandbox`. So nginx sends a second policy as an HTTP header (`flake.nix`). Browsers enforce both policies, and a resource is allowed only if both allow it (intersection).
 
 The header policy must not contain `default-src`, `script-src` or `style-src`:
 - `default-src` would fall back to `script-src` and `style-src`. Those would then apply to the header too, with no hashes, and would block Astro's hashed inline scripts.
@@ -70,17 +70,13 @@ Final header value, with the reason for each directive:
 | `/sitemap-index.xml`, `/sitemap-0.xml` | `public, max-age=3600` | Sitemaps are regenerated per build. |
 | `/rss.xml`, `/writeups/rss.xml`, `/notes/rss.xml` | `public, max-age=3600` | Feeds are regenerated per build. |
 
-Content types set explicitly: `application/xml` for `/sitemap-index.xml` and `/sitemap-0.xml`, `application/rss+xml; charset=utf-8` for the three feeds, `application/manifest+json` for `/site.webmanifest`, and `text/plain; charset=utf-8` for `/.well-known/security.txt` and `/pgp-key.txt`.
+Content types: `application/rss+xml` for the three feeds and `application/manifest+json` for `/site.webmanifest` are set explicitly; everything else uses nginx's `mime.types` (sitemaps are `text/xml`). `charset utf-8` applies to HTML, text, XML and RSS responses, so `/.well-known/security.txt` and `/pgp-key.txt` are `text/plain; charset=utf-8`.
 
-No suffix-splat pattern (such as `/*.xml`) is used: it is not reliably supported across hosts, and it would also match nested feeds. Each XML file is listed explicitly. If the sitemap is ever split, `sitemap-1.xml` and later need their own block.
-
-**Overlapping rules.** `/*` and `/_astro/*` both match a file under `/_astro/`. Cloudflare Pages documents that a `! Name` line detaches a header set by an earlier matching block, and `_headers` uses it in each override block (`! Cache-Control`) before setting the new value. Netlify's handling of overlapping rules and of `!` detach is NOT verified in this repository: treat it as untested. After deploy, check each path with `curl -I` and confirm exactly one `Cache-Control` value per path, on both hosts.
+The sitemaps are matched by exact name. If the sitemap is ever split, add `sitemap-1.xml` and later to the regex in `flake.nix`.
 
 ## Secrets
 
-- `GITHUB_TOKEN` is declared in `astro.config.mjs` through `env.schema` as `envField.string({ context: 'server', access: 'secret', optional: true })`. `context: 'server'` means it is only readable in server-side code at build time. `access: 'secret'` means it is never exposed to client code and cannot be imported from `astro:env/client`.
-- The value is never committed. `.env.example` documents the variable with an empty value. Real values live in the host's secret store (Cloudflare or Netlify environment variables) and the CI secret store.
-- The token is a fine-grained, read-only, public-repositories-only personal access token (see `.env.example`).
+The repository and the build use no secret. CI holds none either (see Supply chain).
 
 ## Supply chain
 
@@ -104,103 +100,26 @@ The contact address is not in the HTML as plain text, and it is not a `mailto:` 
 - `src/components/ContactEmail.astro` writes the address reversed in `data-u` and `data-d` attributes and shows a readable fallback such as `name [at] domain [dot] tld`.
 - `src/scripts/email.ts` runs in the browser, reverses the attributes back, and replaces the fallback with a real `mailto:` link.
 - Without JavaScript, visitors see the fallback text, not a link. The address is still recoverable by a determined scraper that runs the script. This is a deterrent against simple harvesters, not a guarantee.
-- When `CONTACT_EMAIL` is still the placeholder, the component renders "Contact address coming soon" instead.
+- When `CONTACT_EMAIL` is still the placeholder, the component renders "address coming soon" instead, and the build prints a warning (`checkConfig` in `src/lib/warn-config.ts`).
 
-## Equivalents
+## Production configuration
 
-### Vercel (`vercel.json`)
+A static site runs no code at request time, so it cannot send HTTP headers itself: nginx does. `serverBlock` in `flake.nix` is the only source for the headers, the cache rules and the `/sitemap.xml` redirect.
 
-```json
-{
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Content-Security-Policy", "value": "connect-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()" },
-        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
-        { "key": "Cross-Origin-Resource-Policy", "value": "same-origin" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/_astro/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    }
-  ],
-  "redirects": [
-    { "source": "/sitemap.xml", "destination": "/sitemap-index.xml", "permanent": true }
-  ]
-}
-```
-
-Vercel does not read `_headers`. This snippet omits the other overrides from the Cache policy and Content types sections (`/pagefind/*`, `/shiki.css`, sitemaps, feeds, `/site.webmanifest`, `/.well-known/security.txt`, `/pgp-key.txt`); add them the same way if needed. Check with `curl -I` after deploy how Vercel combines the `/(.*)` and `/_astro/(.*)` values.
-
-### Nginx
-
-Nginx replaces all `add_header` directives of a parent block as soon as a nested `location` declares any `add_header`. Put the shared headers in one include file and include it in each location that needs them.
-
-`/etc/nginx/snippets/security-headers.conf`:
-
-```nginx
-add_header Content-Security-Policy "connect-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" always;
-add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-add_header X-Content-Type-Options "nosniff" always;
-add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()" always;
-add_header Cross-Origin-Opener-Policy "same-origin" always;
-add_header Cross-Origin-Resource-Policy "same-origin" always;
-add_header X-Frame-Options "DENY" always;
-```
-
-Server block:
-
-```nginx
-server {
-    # ... TLS and root configuration ...
-    root /var/www/blog/dist;
-
-    include /etc/nginx/snippets/security-headers.conf;
-    add_header Cache-Control "public, max-age=0, must-revalidate" always;
-
-    location = /sitemap.xml {
-        return 301 /sitemap-index.xml;
-    }
-
-    location /_astro/ {
-        include /etc/nginx/snippets/security-headers.conf;
-        add_header Cache-Control "public, max-age=31536000, immutable" always;
-    }
-
-    location /pagefind/ {
-        include /etc/nginx/snippets/security-headers.conf;
-        add_header Cache-Control "public, max-age=3600" always;
-    }
-
-    location = /site.webmanifest {
-        include /etc/nginx/snippets/security-headers.conf;
-        add_header Cache-Control "public, max-age=0, must-revalidate" always;
-        types { application/manifest+json webmanifest; }
-    }
-}
-```
-
-This example omits the other overrides from the Cache policy and Content types sections (`/shiki.css`, sitemaps, feeds, `/.well-known/security.txt`, `/pgp-key.txt`); add them the same way if needed.
-
-Nginx serves `/_astro/` with `Cache-Control` from the nested block, so the parent's `max-age=0` does not apply there. Check the MIME mapping for `webmanifest` in your distribution's `mime.types`; the `types` line above sets it explicitly.
+- `nixosModules.default` adds the block to the server's nginx (README, Deployment).
+- `nix flake check` runs `nginx -t` on it (`checks.nginx`), so a syntax error fails CI.
+- nginx drops inherited `add_header` lines as soon as a `location` sets its own, so the shared set is repeated in each location.
+- `absolute_redirect off`: behind the Cloudflare Tunnel nginx sees plain HTTP, and absolute redirects (such as `/writeups` → `/writeups/`) would point to `http://`. Relative redirects keep the visitor on HTTPS. Internal links already end with `/`.
+- Unknown paths get `404.html` (`error_page 404`).
 
 ## Final verification checklist
 
-None of the host configurations in this document (`public/_headers`, `public/_redirects`, the Vercel and Nginx examples) has been tested locally or on a host yet: there is no deploy. Run after the first deploy, on the production URL.
+The nginx block passes `nginx -t` in CI, but it has not been tested on the production host yet: there is no deploy. Run after the first deploy, on the production URL.
 
 1. **Mozilla Observatory** (`https://developer.mozilla.org/en-US/observatory`): scan the production host. Target: grade A or higher.
 2. **securityheaders.com**: scan the production host. Every header in the tables above must be present with the expected value.
 3. **Browser console CSP check**: open each page type (home, a post, a note, search, 404) in a current Chrome and Firefox with DevTools open. There must be no `Refused to …` CSP violation. Check the Search page specifically, since Pagefind needs `'wasm-unsafe-eval'` and `connect-src 'self'`.
-4. **Header verification with curl**: `curl -sI https://<host>/` and `curl -sI https://<host>/_astro/<any-file>.js`. Confirm exactly one `Cache-Control` value per path (see Overlapping rules).
+4. **Header verification with curl**: `curl -sI https://<host>/` and `curl -sI https://<host>/_astro/<any-file>.js`. Confirm exactly one `Cache-Control` value per path.
 5. **Feeds**: validate `/rss.xml` with the W3C Feed Validator (`https://validator.w3.org/feed/`). Confirm `Content-Type: application/rss+xml; charset=utf-8`.
 6. **Sitemap**: validate `/sitemap-index.xml` and one `sitemap-0.xml` (sitemaps.org schema, all URLs return 200). Confirm `/sitemap.xml` returns `301` to `/sitemap-index.xml`.
 7. **Rich Results Test** (`https://search.google.com/test/rich-results`): run on one post and on the home page. JSON-LD must be valid.

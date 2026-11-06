@@ -1,0 +1,6 @@
+---
+// Brand prompt shared by header and footer: chiloute@redteam:~<section>$ (only "chiloute" is read aloud).
+interface Props { section?: string }
+const { section = '' } = Astro.props;
+---
+<span translate="no" class="text-accent">chiloute</span><span aria-hidden="true" translate="no" class="font-normal text-muted">@redteam:<span class="text-highlight">~{section}</span>$</span>

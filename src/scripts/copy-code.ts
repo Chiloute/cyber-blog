@@ -1,6 +1,8 @@
 // Adds a Copy button to every pre.astro-code and Terminal block.
 // Every pre gets tabindex="0" + aria-label always (simpler than detecting overflow).
 const IDLE = 'Copy';
+// Text is pre-selected on fallback, so the message names the platform's own copy shortcut.
+const COPY_KEYS = /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘\u00a0C' : 'Ctrl+C';
 let live: HTMLElement | undefined;
 
 function announce(msg: string) {
@@ -31,6 +33,7 @@ function select(el: HTMLElement) {
 
 function enhance(pre: HTMLElement) {
   if (!pre.hasAttribute('tabindex')) pre.tabIndex = 0;
+  pre.translate = false;
   pre.setAttribute('role', 'region');
   pre.setAttribute('aria-label', labels.get(pre) ?? 'Code block');
   let wrap = pre.closest<HTMLElement>('[data-copy-wrap]');
@@ -59,7 +62,7 @@ function enhance(pre: HTMLElement) {
   btn.addEventListener('click', async () => {
     if (!navigator.clipboard) {
       select(pre);
-      flash(IDLE, 'Press Ctrl+C to copy');
+      flash(IDLE, `Code selected: press ${COPY_KEYS} to copy`);
       return;
     }
     try {
@@ -67,7 +70,7 @@ function enhance(pre: HTMLElement) {
       flash('Copied', 'Copied');
     } catch {
       select(pre);
-      flash('Failed', 'Copy failed');
+      flash('Failed', `Copy failed. Code selected: press ${COPY_KEYS} to copy`);
     }
   });
   // Window bar above the pre (the button never overlaps code). Terminal ships its own bar.

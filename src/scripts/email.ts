@@ -5,5 +5,6 @@ document.querySelectorAll<HTMLElement>('[data-email]').forEach((el) => {
   const a = document.createElement('a');
   a.href = `mailto:${addr}`;
   a.textContent = addr;
+  a.translate = false;
   el.replaceWith(a);
 });

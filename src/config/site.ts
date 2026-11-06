@@ -1,7 +1,6 @@
 // Single source of truth for site-wide constants.
 
 export const AUTHOR = 'chiloute';
-export const SITE_TITLE = 'chiloute';
 export const SITE_DESCRIPTION = 'CTF writeups, security notes and small projects.';
 export const SITE_URL = 'https://chiloute.fr';
 
@@ -54,7 +53,7 @@ export const securityTxt = {
   pgpKeyPath: '/pgp-key.txt',
 } as const;
 
-// Placeholders: T3 finalizes these.
+// Browser UI color per theme (= --bg in global.css); theme-toggle.ts syncs the meta at runtime.
 export const themeColors = {
   light: '#f7f6f3',
   dark: '#0c0c0e',

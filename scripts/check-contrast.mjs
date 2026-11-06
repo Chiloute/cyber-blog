@@ -43,6 +43,9 @@ const pairs = [
   ['callout text / surface', 'text', 'surface', 4.5],
   ...['web', 'crypto', 'pwn', 'reverse', 'forensic', 'osint', 'misc'].map((k) => [`badge cat-${k} / surface`, `cat-${k}`, 'surface', 4.5]),
   ...['easy', 'medium', 'hard', 'insane'].map((k) => [`badge diff-${k} / surface`, `diff-${k}`, 'surface', 4.5]),
+  // Active state (header nav, writeup filter chips) sits on highlight-bg.
+  ...['web', 'crypto', 'pwn', 'reverse', 'forensic', 'osint', 'misc'].map((k) => [`badge cat-${k} / highlight-bg`, `cat-${k}`, 'highlight-bg', 4.5]),
+  ...['easy', 'medium', 'hard', 'insane'].map((k) => [`badge diff-${k} / highlight-bg`, `diff-${k}`, 'highlight-bg', 4.5]),
 ];
 
 const md = process.argv.includes('--markdown');

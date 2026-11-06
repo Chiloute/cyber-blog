@@ -56,12 +56,19 @@ test('writeup filters update live count', async ({ page }) => {
   await expect(count).toHaveText(`Showing ${total} of ${total} writeups`);
   await expect(count).toHaveAttribute('role', 'status');
   // Fixtures: exactly one "web" writeup (example-web-ssti), the draft example is "reverse".
-  await page.locator('#f-category').selectOption('web');
+  const clear = page.getByRole('button', { name: 'Clear filters' });
+  await expect(clear).toBeHidden();
+  await page.getByRole('group', { name: 'category' }).getByRole('radio', { name: 'web', exact: true }).check();
   await expect(count).toHaveText(`Showing 1 of ${total} writeups`);
   await expect(page).toHaveURL(/\?category=web/);
-  await page.getByRole('button', { name: 'Reset' }).click();
+  await expect(page.locator('[data-echo]')).toHaveText('$ ls -lt ~/writeups --category=web');
+  await clear.focus();
+  await page.keyboard.press('Enter');
   await expect(page).not.toHaveURL(/category=/);
   await expect(count).toHaveText(`Showing ${total} of ${total} writeups`);
+  await expect(clear).toBeHidden();
+  // Focus does not fall back to <body> when the focused button disappears.
+  await expect(page.getByRole('group', { name: 'category' }).getByRole('radio', { name: 'all' })).toBeFocused();
 });
 
 test('search finds the example writeup', async ({ page }) => {

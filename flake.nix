@@ -66,7 +66,7 @@
           };
         };
 
-      # The production site (dist/). Built offline: the projects page uses src/data/projects.fallback.json.
+      # The production site (dist/). Built offline.
       site = pkgs:
         let lib = pkgs.lib; in
         pkgs.buildNpmPackage {
@@ -91,13 +91,73 @@
           checkPhase = "npm run check:drafts";
           installPhase = "cp -r dist $out";
         };
+
+      # nginx server block for the production site: the only source of the HTTP security and cache headers
+      # (a static site cannot send headers itself). Used by nixosModules.default, validated by checks.nginx.
+      serverBlock = root:
+        let
+          # nginx drops inherited add_header as soon as a location sets one: repeat the shared set everywhere.
+          headers = ''
+            add_header Content-Security-Policy "connect-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" always;
+            add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+            add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()" always;
+            add_header Cross-Origin-Opener-Policy "same-origin" always;
+            add_header Cross-Origin-Resource-Policy "same-origin" always;
+            add_header X-Frame-Options "DENY" always;
+          '';
+          cached = maxAge: extra: "${headers}add_header Cache-Control \"public, max-age=${maxAge}\" always;\n${extra}";
+        in ''
+          server {
+            listen 80;
+            server_name chiloute.fr;
+            root ${root};
+            charset utf-8;
+            # Behind the Cloudflare Tunnel nginx sees plain HTTP: relative redirects keep the visitor on https.
+            absolute_redirect off;
+            error_page 404 /404.html;
+            ${headers}
+            add_header Cache-Control "public, max-age=0, must-revalidate" always;
+
+            location = /sitemap.xml { return 301 /sitemap-index.xml; }
+            location /_astro/ { ${cached "31536000, immutable" ""} }
+            location /pagefind/ { ${cached "3600" ""} }
+            location ~ ^/(shiki\.css|sitemap-index\.xml|sitemap-0\.xml)$ { ${cached "3600" ""} }
+            location ~ ^/(writeups/|notes/)?rss\.xml$ { ${cached "3600" "types { application/rss+xml xml; }"} }
+            location = /site.webmanifest { ${headers} add_header Cache-Control "public, max-age=0, must-revalidate" always; types { application/manifest+json webmanifest; } }
+          }
+        '';
     in
     {
       packages = forAllSystems (_system: pkgs: { default = site pkgs; });
 
+      # Server: imports = [ inputs.blog.nixosModules.default ]; (see README, Deployment).
+      nixosModules.default = { pkgs, ... }: {
+        services.nginx = {
+          enable = true;
+          # Locked package (the one CI built), not a rebuild with the server's nixpkgs.
+          appendHttpConfig = serverBlock self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
+      };
+
       checks = forAllSystems (system: pkgs: {
         pre-commit-check = git-hooks.lib.${system}.run { src = ./.; hooks = cheapHooks pkgs; };
         site = self.packages.${system}.default;
+        # Syntax check of the production server block (nginx -t in the sandbox).
+        nginx = pkgs.runCommand "nginx-config-check" { } ''
+          cat > nginx.conf <<'EOF'
+          error_log stderr;
+          pid /dev/null;
+          events { }
+          http {
+            include ${pkgs.nginx}/conf/mime.types;
+            access_log off;
+            ${builtins.replaceStrings [ "listen 80;" ] [ "listen 8080;" ] (serverBlock "/var/empty")}
+          }
+          EOF
+          ${pkgs.nginx}/bin/nginx -e stderr -t -p "$PWD" -c "$PWD/nginx.conf" && touch $out
+        '';
       });
 
       devShells = forAllSystems (system: pkgs:

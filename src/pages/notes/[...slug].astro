@@ -1,7 +1,6 @@
 ---
 import { render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { components } from '../../components/mdx/index.ts';
 import { getPublished } from '../../lib/publishable.ts';
 import { readingMinutes } from '../../lib/reading-time.ts';
 
@@ -22,5 +21,5 @@ const d = entry.data;
   kind="note" id={entry.id} title={d.title} description={d.description} date={d.date} updated={d.updated}
   tags={d.tags} readingMinutes={readingMinutes(entry.body ?? '')} headings={headings} prev={prev} next={next}
 >
-  <Content components={components} />
+  <Content />
 </PostLayout>
