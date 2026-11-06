@@ -1,0 +1,27 @@
+---
+import { render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { components } from '../../components/mdx/index.ts';
+import { getPublished } from '../../lib/publishable.ts';
+import { readingMinutes } from '../../lib/reading-time.ts';
+
+export async function getStaticPaths() {
+  const list = await getPublished('writeups'); // newest first
+  const link = (e?: (typeof list)[number]) => (e ? { title: e.data.title, href: `/writeups/${e.id}/` } : undefined);
+  return list.map((entry, i) => ({
+    params: { slug: entry.id },
+    // previous = published before (older), next = published after (newer)
+    props: { entry, prev: link(list[i + 1]), next: link(list[i - 1]) },
+  }));
+}
+const { entry, prev, next } = Astro.props;
+const { Content, headings } = await render(entry);
+const d = entry.data;
+---
+<PostLayout
+  kind="writeup" id={entry.id} title={d.title} description={d.description} date={d.date} updated={d.updated}
+  tags={d.tags} readingMinutes={readingMinutes(entry.body ?? '')} headings={headings} prev={prev} next={next}
+  writeup={{ ctf: d.ctf, category: d.category, difficulty: d.difficulty, points: d.points, team: d.team }}
+>
+  <Content components={components} />
+</PostLayout>

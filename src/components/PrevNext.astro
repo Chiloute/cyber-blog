@@ -1,0 +1,11 @@
+---
+type Link = { title: string; href: string };
+interface Props { kind: 'writeup' | 'note'; prev?: Link | undefined; next?: Link | undefined }
+const { kind, prev, next } = Astro.props;
+---
+{(prev || next) && (
+  <nav aria-label={`More ${kind}s`} class="mt-12 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:justify-between">
+    {prev ? <a href={prev.href} rel="prev" class="text-accent underline">Previous {kind}: {prev.title}</a> : <span />}
+    {next && <a href={next.href} rel="next" class="text-accent underline sm:text-right">Next {kind}: {next.title}</a>}
+  </nav>
+)}

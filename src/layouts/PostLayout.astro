@@ -1,0 +1,73 @@
+---
+// MDX headings start at h2: the page <h1> is the title rendered here.
+import BaseLayout from './BaseLayout.astro';
+import Badge from '../components/Badge.astro';
+import Disclaimer from '../components/Disclaimer.astro';
+import TOC from '../components/TOC.astro';
+import PrevNext from '../components/PrevNext.astro';
+import { SITE_URL } from '../config/site.ts';
+import { formatDate, isoDate } from '../lib/dates.ts';
+
+export interface PostLayoutProps {
+  kind: 'writeup' | 'note';
+  /** Collection entry id (slug); used for the OG image path. */
+  id: string;
+  title: string;
+  description: string;
+  date: Date;
+  updated?: Date | undefined;
+  tags: string[];
+  readingMinutes: number;
+  headings: { depth: number; slug: string; text: string }[];
+  prev?: { title: string; href: string } | undefined;
+  next?: { title: string; href: string } | undefined;
+  /** Writeup-only meta; omit for notes. */
+  writeup?: { ctf: string; category: string; difficulty: string; points?: number | undefined; team?: string | undefined } | undefined;
+}
+const p = Astro.props as PostLayoutProps;
+const section = p.kind === 'writeup' ? 'writeups' : 'notes';
+const base = Astro.site ?? new URL(SITE_URL);
+const ogImage = new URL(`/og/${section}/${p.id}.png`, base).href;
+const w = p.writeup;
+---
+<BaseLayout
+  title={p.title}
+  description={p.description}
+  type="article"
+  pagefindBody
+  publishedTime={p.date}
+  {...(p.updated ? { modifiedTime: p.updated } : {})}
+  tags={p.tags}
+  ogImage={ogImage}
+  ogImageAlt={p.title}
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: p.kind === 'writeup' ? 'Writeups' : 'Notes', path: `/${section}/` },
+    { name: p.title, path: `/${section}/${p.id}/` },
+  ]}
+>
+  <article class="mx-auto max-w-[70ch]">
+    <header>
+      <h1 class="text-3xl font-bold">{p.title}</h1>
+      <p class="mt-2 text-sm text-muted">
+        <time datetime={isoDate(p.date)}>{formatDate(p.date)}</time>
+        {p.updated && <> · Updated <time datetime={isoDate(p.updated)}>{formatDate(p.updated)}</time></>}
+        · {p.readingMinutes} min read
+        {w && <> · {w.ctf}{w.points !== undefined && ` · ${w.points} pts`}{w.team && ` · ${w.team}`}</>}
+      </p>
+      <p class="mt-2 flex flex-wrap gap-2">
+        {w && <><Badge kind="category" value={w.category} /><Badge kind="difficulty" value={w.difficulty} /></>}
+        {p.tags.map((t) => <a href={`/writeups/tags/${encodeURIComponent(t)}/`} class="font-mono text-sm text-accent underline">#{t}</a>)}
+      </p>
+    </header>
+    {p.kind === 'writeup' && <Disclaimer />}
+    <TOC headings={p.headings} />
+    <div class="prose max-w-none">
+      <slot />
+    </div>
+    <PrevNext kind={p.kind} prev={p.prev} next={p.next} />
+  </article>
+  <script>
+    import '../scripts/copy-code.ts';
+  </script>
+</BaseLayout>

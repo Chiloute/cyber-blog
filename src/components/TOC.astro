@@ -1,0 +1,27 @@
+---
+interface Props { headings: { depth: number; slug: string; text: string }[] }
+const hs = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+// Nest h3 under the preceding h2 (an orphan h3 starts its own group).
+const groups: { h: (typeof hs)[number]; kids: typeof hs }[] = [];
+for (const h of hs) {
+  if (h.depth === 3 && groups.length) groups[groups.length - 1]!.kids.push(h);
+  else groups.push({ h, kids: [] });
+}
+---
+{hs.length >= 2 && (
+  <nav aria-label="Table of contents" class="my-6 rounded border border-border bg-surface p-4">
+    <p class="m-0 font-bold">Contents</p>
+    <ol class="m-0 mt-2 list-none space-y-1 p-0">
+      {groups.map(({ h, kids }) => (
+        <li>
+          <a href={`#${h.slug}`} class="text-accent underline">{h.text}</a>
+          {kids.length > 0 && (
+            <ol class="list-none space-y-1 pl-4 pt-1">
+              {kids.map((k) => <li><a href={`#${k.slug}`} class="text-accent underline">{k.text}</a></li>)}
+            </ol>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}

@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { getPublished } from '../../../lib/publishable.ts';
+import { readingMinutes } from '../../../lib/reading-time.ts';
+
+export async function getStaticPaths() {
+  const list = await getPublished('writeups');
+  const tags = [...new Set(list.flatMap((e) => e.data.tags))];
+  return tags.map((tag) => ({
+    params: { tag },
+    props: { tag, entries: list.filter((e) => e.data.tags.includes(tag)) },
+  }));
+}
+const { tag, entries } = Astro.props;
+---
+<BaseLayout
+  title={`Writeups tagged “${tag}”`}
+  description={`CTF writeups tagged ${tag}.`}
+  breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Writeups', path: '/writeups/' }, { name: `Tag: ${tag}`, path: `/writeups/tags/${encodeURIComponent(tag)}/` }]}
+>
+  <h1 class="text-3xl font-bold">Writeups tagged “{tag}”</h1>
+  <p class="mt-2"><a href="/writeups/" class="text-accent underline">All writeups</a></p>
+  <ul class="mt-6 list-none space-y-4 p-0">
+    {entries.map((e) => (
+      <PostCard
+        href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+        readingMinutes={readingMinutes(e.body ?? '')} category={e.data.category} difficulty={e.data.difficulty}
+        ctf={e.data.ctf} tags={e.data.tags}
+      />
+    ))}
+  </ul>
+</BaseLayout>

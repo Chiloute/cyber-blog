@@ -1,0 +1,22 @@
+---
+import Badge from './Badge.astro';
+import { formatDate, isoDate } from '../lib/dates.ts';
+interface Props {
+  href: string; title: string; description: string; date: Date; readingMinutes: number;
+  category: string; difficulty: string; ctf: string; tags: string[];
+}
+const { href, title, description, date, readingMinutes, category, difficulty, ctf, tags } = Astro.props;
+---
+<li data-post data-category={category} data-difficulty={difficulty} data-ctf={ctf}>
+  <article class="rounded border border-border p-4">
+    <h2 class="m-0 text-xl font-bold"><a href={href} class="text-accent underline">{title}</a></h2>
+    <p class="mt-1 text-sm text-muted">
+      <time datetime={isoDate(date)}>{formatDate(date)}</time> · {ctf} · {readingMinutes} min read
+    </p>
+    <p class="mt-2">{description}</p>
+    <p class="mt-2 flex flex-wrap gap-2">
+      <Badge kind="category" value={category} /><Badge kind="difficulty" value={difficulty} />
+      {tags.map((t) => <a href={`/writeups/tags/${encodeURIComponent(t)}/`} class="font-mono text-sm text-accent underline">#{t}</a>)}
+    </p>
+  </article>
+</li>

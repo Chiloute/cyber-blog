@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublished } from '../../lib/publishable.ts';
+import { readingMinutes } from '../../lib/reading-time.ts';
+
+const entries = await getPublished('writeups');
+const uniq = (f: (e: (typeof entries)[number]) => string) => [...new Set(entries.map(f))].sort();
+const filters = [
+  { name: 'category', label: 'Category', values: uniq((e) => e.data.category) },
+  { name: 'difficulty', label: 'Difficulty', values: uniq((e) => e.data.difficulty) },
+  { name: 'ctf', label: 'CTF', values: uniq((e) => e.data.ctf) },
+];
+---
+<BaseLayout
+  title="Writeups"
+  description="CTF writeups: web, pwn, crypto, forensics, reverse engineering and more."
+  breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Writeups', path: '/writeups/' }]}
+>
+  <h1 class="text-3xl font-bold">Writeups</h1>
+  <form role="search" aria-label="Filter writeups" data-filters hidden class="mt-6 flex flex-wrap items-end gap-4">
+    {filters.map((f) => (
+      <div class="flex flex-col gap-1">
+        <label for={`f-${f.name}`} class="text-sm font-bold">{f.label}</label>
+        <select id={`f-${f.name}`} name={f.name} class="target-min rounded border border-border-ui bg-surface px-2 text-text">
+          <option value="">All</option>
+          {f.values.map((v) => <option value={v}>{v}</option>)}
+        </select>
+      </div>
+    ))}
+    <button type="reset" class="target-min cursor-pointer rounded border border-border-ui bg-surface px-3 text-text">Reset</button>
+  </form>
+  <p role="status" aria-live="polite" data-count hidden class="mt-4 text-sm text-muted" data-total={entries.length}></p>
+  <ul class="mt-6 list-none space-y-4 p-0" data-list>
+    {entries.map((e) => (
+      <PostCard
+        href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+        readingMinutes={readingMinutes(e.body ?? '')} category={e.data.category} difficulty={e.data.difficulty}
+        ctf={e.data.ctf} tags={e.data.tags}
+      />
+    ))}
+  </ul>
+  <p data-empty hidden={entries.length > 0 ? true : undefined} class="mt-6">
+    {entries.length === 0 ? 'No writeups published yet.' : 'No writeups match these filters.'}
+  </p>
+  <script>
+    import '../../scripts/filters.ts';
+  </script>
+</BaseLayout>
