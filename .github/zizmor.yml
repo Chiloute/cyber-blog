@@ -1,0 +1,4 @@
+rules:
+  # Its auto-fix ('$/...') is rejected by actionlint, which only accepts './...' for local actions and workflows.
+  self-repository:
+    disable: true

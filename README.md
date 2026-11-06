@@ -56,7 +56,7 @@ The dev server runs at `http://localhost:4321`.
 direnv allow   # once; or `nix develop` without direnv
 ```
 
-Entering the shell installs the git hooks automatically (`.pre-commit-config.yaml` is generated and git-ignored). Pre-commit runs `eslint`, the unit tests, JSON and merge-conflict checks and the `ripsecrets` secret scanner (this repo is security-focused). Pre-push runs `astro check`. On Linux the shell also sets `PW_CHROMIUM_PATH` to the nixpkgs Chromium, so `npm run test:a11y` works on NixOS without a downloaded browser; on macOS Playwright uses its own browser. `nix flake check` runs only the cheap hooks, since the npm hooks need `node_modules`.
+Entering the shell installs the git hooks automatically (`.pre-commit-config.yaml` is generated and git-ignored). Pre-commit runs `eslint`, the unit tests, JSON and merge-conflict checks, the `ripsecrets` secret scanner (this repo is security-focused), and `actionlint` + `zizmor` on changes under `.github/`. Pre-push runs `astro check`. On Linux the shell also sets `PW_CHROMIUM_PATH` to the nixpkgs Chromium, so `npm run test:a11y` works on NixOS without a downloaded browser; on macOS Playwright uses its own browser. `nix flake check` runs only the cheap hooks, since the npm hooks need `node_modules`.
 
 `shiki.css` (syntax highlighting colours) is generated at build time into `dist/shiki.css` (`src/integrations/shiki-css.mjs`). In dev, a middleware serves `/shiki.css` live, but rules accumulate as pages are rendered: reload a page after its first render to get code colours. Search (Pagefind) only works after `npm run build`, because the index is built from `dist`.
 
