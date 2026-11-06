@@ -1,0 +1,35 @@
+---
+title: nur-packages
+---
+
+## Context
+
+My personal [NUR](https://github.com/nix-community/NUR) repository, mainly for the security tools I write.
+
+## Packages
+
+| Package | Description |
+|---|---|
+| [`jwt-tui`](/projects/jwt-tui/) | TUI to decode, tamper with, and re-sign JSON Web Tokens. |
+
+## Usage
+
+Through NUR, with the `nur` overlay enabled:
+
+```nix
+home.packages = [ pkgs.nur.repos.Chiloute.jwt-tui ];
+```
+
+As a flake input:
+
+```nix
+inputs.nur-chiloute.url = "github:Chiloute/nur-packages";
+# then
+environment.systemPackages = [ inputs.nur-chiloute.packages.${pkgs.system}.jwt-tui ];
+```
+
+Without installing:
+
+```sh
+nix run github:Chiloute/nur-packages#jwt-tui
+```

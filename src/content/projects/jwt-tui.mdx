@@ -1,0 +1,28 @@
+---
+title: jwt-tui
+---
+
+## Context
+
+A terminal UI in Go to decode, edit and re-sign JSON Web Tokens, aimed at people testing JWT handling.
+
+## How it works
+
+- Four panels (Encoded, Header, Payload, Secret) stay in sync: editing one rebuilds the others and recomputes signature validity, expiry and edit state.
+- Signing and verification with HMAC, RSA, ECDSA and EdDSA keys.
+- Security checks: algorithm confusion, `alg: none`, weak keys.
+- Print mode (`--print`, `--json`) for scripts and CI, exit code `0` when the signature is valid.
+
+## Install
+
+```sh
+go install github.com/chiloute/jwt-tui/cmd/jwt-tui@latest
+# or, with Nix
+nix run github:chiloute/jwt-tui
+```
+
+With [NUR](https://github.com/nix-community/NUR), through my [nur-packages](/projects/nur-packages/) repository and the `nur` overlay:
+
+```nix
+home.packages = [ pkgs.nur.repos.Chiloute.jwt-tui ];
+```

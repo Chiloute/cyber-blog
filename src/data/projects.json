@@ -1,28 +1,71 @@
 {
-  "_comment": "Featured projects, in display order. Edited by hand: the production build is offline, so nothing is fetched from GitHub. PLACEHOLDER data, replace with real values.",
+  "_comment": "Featured projects, in display order. Edited by hand: the production build is offline, so nothing is fetched from GitHub. Values copied from the GitHub API on 2026-11-06.",
   "projects": [
     {
-      "repo": "chiloute/example-repo-1",
-      "description": "Placeholder description for example-repo-1.",
+      "repo": "Chiloute/jwt-tui",
+      "description": "Terminal UI to decode, tamper with, and re-sign JWTs. Real-time validity/expiry, HMAC/RSA/ECDSA/EdDSA support, built-in security analysis (alg confusion, alg:none, weak keys), and scriptable --print/--json output for CI.",
       "homepage": null,
       "stars": 0,
       "languages": [
-        "TypeScript",
-        "Python"
+        "Go",
+        "Nix"
       ],
-      "updatedAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-10-28T00:06:09Z",
       "license": "MIT"
     },
     {
-      "repo": "chiloute/example-repo-2",
-      "description": "Placeholder description for example-repo-2.",
+      "repo": "anotherhadi/spilltea",
+      "description": "Contributor. A minimal, terminal-based HTTP(S) proxy for pentesters and CTF players. Think Burp Suite or Caido, but entirely in your terminal.",
+      "homepage": null,
+      "stars": 7,
+      "languages": [
+        "Go",
+        "Lua",
+        "Nix",
+        "Shell"
+      ],
+      "updatedAt": "2026-10-20T20:59:42Z",
+      "license": "MIT"
+    },
+    {
+      "repo": "Chiloute/nur-packages",
+      "description": "Personal NUR repository packaging my security tools for Nix, starting with jwt-tui. Usable as a flake input, an overlay or through NUR.",
       "homepage": null,
       "stars": 0,
       "languages": [
-        "Rust"
+        "Nix"
       ],
-      "updatedAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-11-02T15:14:50Z",
       "license": "MIT"
+    },
+    {
+      "repo": "Chiloute/nixy",
+      "description": "NixOS flake for a Hyprland laptop and a self-hosted server behind a Cloudflare Tunnel, built on home-manager, Stylix, sops-nix and nvf. Fork of anotherhadi/nixy.",
+      "homepage": null,
+      "stars": 1,
+      "languages": [
+        "Nix",
+        "Shell"
+      ],
+      "updatedAt": "2026-11-06T03:30:56Z",
+      "license": "MIT"
+    },
+    {
+      "repo": "Chiloute/cyber-blog",
+      "description": "Source of this site: a static Astro blog for CTF writeups, security notes and projects, with Pagefind search and a Nix build.",
+      "homepage": null,
+      "stars": 0,
+      "languages": [
+        "Astro",
+        "TypeScript",
+        "JavaScript",
+        "CSS",
+        "MDX",
+        "Nix",
+        "Shell"
+      ],
+      "updatedAt": "2026-11-06T13:50:04Z",
+      "license": null
     }
   ]
 }

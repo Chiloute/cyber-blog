@@ -221,7 +221,7 @@ Same body rules as writeups. Example: `src/content/notes/linux-privesc-cheatshee
 | `draft` | boolean, default `false` (hidden from `npm run build`, shown in `npm run dev`) | no |
 | `title` | string | no |
 
-Example: `src/content/projects/example-repo-1.mdx`.
+Example: `src/content/projects/jwt-tui.mdx`.
 
 ## Security
 
