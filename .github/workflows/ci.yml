@@ -12,7 +12,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# static (lint, astro check, unit tests) gates both builds; only a verified build reaches deploy.
+# static (lint, astro check, unit tests) gates both builds. There is no deploy: the server builds the flake itself.
 jobs:
   static:
     runs-on: ubuntu-latest
@@ -29,13 +29,19 @@ jobs:
       - run: npm test
       - run: npm run check:contrast
 
-  build:
+  # Builds the site exactly as the server does (packages.default, check:drafts included) plus the cheap hooks.
+  nix:
     needs: static
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
-    uses: ./.github/workflows/build.yml
-    secrets:
-      GH_PROJECTS_TOKEN: ${{ secrets.GH_PROJECTS_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31.11.3
+      - run: nix flake check -L
 
   e2e:
     needs: static
@@ -66,7 +72,7 @@ jobs:
   # Single required status check for branch protection on main.
   ci-ok:
     if: always()
-    needs: [static, build, e2e]
+    needs: [static, nix, e2e]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
@@ -74,9 +80,3 @@ jobs:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
         run: exit 1
 
-  deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [build, e2e]
-    permissions:
-      contents: read
-    uses: ./.github/workflows/deploy.yml

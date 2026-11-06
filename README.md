@@ -28,11 +28,11 @@ flowchart LR
   G --> P[Pages, RSS, sitemap, OG images]
   P --> D[dist]
   D --> F[pagefind --site dist]
-  F --> E[check:embargo]
-  E --> H[Deploy]
+  F --> E[check:drafts]
+  E --> H[nix build]
 ```
 
-`getPublished` (`src/lib/publishable.ts`) is the single gate for drafts and embargoed entries. `npm run build` covers content to Pagefind; `npm run check:embargo` is a separate step (run in CI after the build).
+`getPublished` (`src/lib/publishable.ts`) is the single gate for drafts. `npm run build` covers content to Pagefind; `npm run check:drafts` is a separate step (run by the Nix build after `npm run build`).
 
 ## Requirements
 
@@ -70,9 +70,9 @@ Entering the shell installs the git hooks automatically (`.pre-commit-config.yam
 | `npm run check` | `astro check`, type and Astro diagnostics |
 | `npm run lint` | `eslint .` |
 | `npm test` | `node --test 'src/**/*.test.ts'`, unit tests |
-| `npm run build:test` | Test-only build into `dist-test/` with drafts included (`BLOG_TEST_DRAFTS=1`, embargo still applied). Never deploy it |
+| `npm run build:test` | Test-only build into `dist-test/` with drafts included (`BLOG_TEST_DRAFTS=1`). Never deploy it |
 | `npm run test:a11y` | `playwright test`: axe-core on sample pages in both themes, plus behaviour tests. Needs a prior `npm run build:test` (the Playwright web server runs `astro preview --outDir dist-test`) |
-| `npm run check:embargo` | `node scripts/check-embargo.mjs`: fails if a draft or embargoed entry leaks into `dist/` |
+| `npm run check:drafts` | `node scripts/check-drafts.mjs`: fails if a draft entry leaks into `dist/` |
 | `npm run check:contrast` | `node scripts/check-contrast.mjs`: WCAG contrast of the tokens in `src/styles/global.css` (`--markdown` prints the table used in `docs/contrast.md`) |
 
 One-off script, not in `package.json`: `node scripts/generate-icons.mjs` regenerates the icons in `public/` (output is committed).
@@ -93,7 +93,7 @@ src/
   integrations/  shiki-css.mjs
   scripts/       client scripts (theme, filters, search, copy, flag, ...)
   data/          projects.fallback.json
-scripts/         check-embargo, check-contrast, generate-icons
+scripts/         check-drafts, check-contrast, generate-icons
 tests/           Playwright specs
 docs/            security, contrast, api-verification, manual a11y checklist
 public/          static files, including _headers and _redirects
@@ -149,16 +149,14 @@ From `src/content.config.ts`:
 | `tags` | array of strings | no | `[]` |
 | `team` | string | no | |
 | `draft` | boolean | no | `false` |
-| `publishAfter` | date | no | |
 | `cover` | object `{ image, alt, decorative }` | no | |
 
 `cover` sub-fields: `image` is an Astro image (relative path), `alt` is a required string, `decorative` is a boolean defaulting to `false`. An empty `alt` is only valid with `decorative: true`; otherwise the build fails. The schema accepts `cover`, but no page renders it at the moment (only the schema references it).
 
-### Draft and embargo
+### Drafts
 
 - `draft: true` excludes the entry from every listing, feed, sitemap, OG image and JSON-LD of `npm run build`. Drafts stay visible in `npm run dev` (and in the test-only `npm run build:test`), so you can preview them locally. Project MDX files (`src/content/projects/`) accept `draft` too.
-- `publishAfter: <date>` excludes the entry until that date. It is evaluated at build time (`isPublishable`: published when `draft` is not `true` and `publishAfter` is unset or `<= now`). The site does not change by itself: the Publish workflow runs a daily scheduled build (`cron: '17 5 * * *'` in `.github/workflows/publish.yml`), and the first build after the date publishes the entry. Until a deploy job is enabled, that build does not reach a host (see Deployment).
-- `npm run check:embargo` fails the build if a blocked entry (slug or title) appears in `dist/`.
+- `npm run check:drafts` fails the build if a draft entry (slug or title) appears in `dist/`.
 
 ### Body
 
@@ -199,7 +197,7 @@ Components (`src/components/mdx/`):
 
 `Spoiler` `title` defaults to `Spoiler`. `Flag` takes a required `value` and an optional `label` (default `Flag`). Without JavaScript the flag is a native `<details>`.
 
-Fenced code blocks are highlighted by Shiki. See `src/content/writeups/example-web-ssti.mdx` for a full example, and `draft-example.mdx` / `embargoed-example.mdx` for the two gates.
+Fenced code blocks are highlighted by Shiki. See `src/content/writeups/example-web-ssti.mdx` for a full example, and `draft-example.mdx` for the draft gate.
 
 ## Adding a note
 
@@ -213,7 +211,6 @@ Create `src/content/notes/<slug>.mdx`. Frontmatter from the schema:
 | `updated` | date | no | |
 | `tags` | array of strings | no | `[]` |
 | `draft` | boolean | no | `false` |
-| `publishAfter` | date | no | |
 
 Same body rules as writeups. Example: `src/content/notes/linux-privesc-cheatsheet.mdx`.
 
@@ -235,7 +232,7 @@ Example: `src/content/projects/example-repo-1.mdx`.
 
 ### GitHub token
 
-Without a token the build uses unauthenticated API calls (rate limited) and falls back to the JSON data. For reliable data, create a fine-grained personal access token, read-only, public repositories only. Store it as the repository secret `GH_PROJECTS_TOKEN` (CI maps it to `GITHUB_TOKEN`) and as a secret on the host. Locally, put `GITHUB_TOKEN=...` in `.env` (git-ignored; `.env.example` documents the variable). Never commit it. The variable is declared server-side and secret in `astro.config.mjs`, so it cannot reach client code.
+Without a token the build uses unauthenticated API calls (rate limited) and falls back to the JSON data. For reliable data, create a fine-grained personal access token, read-only, public repositories only. The production build (`nix build`) runs without network, so it always uses `src/data/projects.fallback.json`: refresh that file when the projects change. Locally, put `GITHUB_TOKEN=...` in `.env` (git-ignored; `.env.example` documents the variable). Never commit it. The variable is declared server-side and secret in `astro.config.mjs`, so it cannot reach client code.
 
 ## Security
 
@@ -245,7 +242,7 @@ Summary (full rationale and host equivalents in `docs/security.md`):
 - Other headers in `public/_headers`: HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, COOP, CORP, X-Frame-Options. `public/_redirects` redirects `/sitemap.xml` to `/sitemap-index.xml`.
 - No inline styles and no `unsafe-inline`: Shiki output is converted to classes.
 - No source maps (`vite.build.sourcemap: false`).
-- Embargo check: `npm run check:embargo`.
+- Drafts check: `npm run check:drafts`.
 - The headers have not been tested on a host yet; `docs/security.md` has the post-deploy checklist.
 
 ## Accessibility
@@ -257,22 +254,42 @@ The target is WCAG 2.2 AA in both themes (see `/accessibility/`, `src/pages/acce
 
 ## Deployment
 
-The hosting provider is not chosen yet.
+The site is self-hosted: a NixOS container on the server builds the flake and serves `dist/` with nginx, exposed through a Cloudflare Tunnel (TLS at Cloudflare). There is no deploy job in CI.
 
-- `public/_headers` and `public/_redirects` are read natively by Cloudflare Pages and Netlify. Vercel and Nginx equivalents are in `docs/security.md`. Netlify's handling of overlapping `_headers` rules is untested.
+- `packages.default` in `flake.nix` is the production `dist/`: `npm ci --ignore-scripts` from `package-lock.json` (`importNpmLock`, no npm hash to maintain), `npm run build`, then `npm run check:drafts`. Build it with `nix build github:Chiloute/cyber-blog`. It runs offline (see GitHub token).
+- Minimal container on the server's flake (inputs: `blog.url = "github:Chiloute/cyber-blog";`):
+
+  ```nix
+  containers.blog = {
+    autoStart = true;
+    privateNetwork = true;
+    hostAddress = "10.233.1.1";
+    localAddress = "10.233.1.2"; # cloudflared on the host points to http://10.233.1.2:80
+    config = {
+      networking.firewall.allowedTCPPorts = [ 80 ];
+      services.nginx = {
+        enable = true;
+        virtualHosts."chiloute.fr" = {
+          root = inputs.blog.packages.x86_64-linux.default;
+          extraConfig = "error_page 404 /404.html;";
+          # Security and cache headers: copy the Nginx section of docs/security.md.
+        };
+      };
+    };
+  };
+  ```
+- Update: `nix flake update blog && nixos-rebuild switch` on the server. Nothing changes on the server without that step.
+- Headers: nginx ignores `public/_headers` and `public/_redirects`, and Cloudflare Tunnel adds none. The nginx configuration must carry them (Nginx section of `docs/security.md`).
 - CI workflows (`.github/workflows/`):
-  - `ci.yml` (pull requests, pushes to `main`): `static` (lint, `astro check`, unit tests, `check:contrast`) must pass before `build` and `e2e` start. `build` (`build.yml`) runs the production build and `check:embargo`, then keeps `dist/` as the `site` artifact (30 days). `e2e` runs the Playwright a11y tests on the draft-inclusive test build. `ci-ok` fails if any of them failed or was skipped. On `main`, `deploy` ships the `site` artifact.
-  - `publish.yml` (daily cron, manual): `build.yml` then `deploy.yml`, so embargoed entries go live without a new commit.
-  - `deploy.yml` (reusable): downloads the `site` artifact and ships it as is, never rebuilds. `environment: production`, one deploy at a time. Rollback: re-run the `deploy` job of an older run (its artifact is kept 30 days).
+  - `ci.yml` (pull requests, pushes to `main`): `static` (lint, `astro check`, unit tests, `check:contrast`) must pass before `nix` and `e2e` start. `nix` runs `nix flake check`, which builds `packages.default` exactly as the server does (with `check:drafts`) and runs the cheap git hooks. `e2e` runs the Playwright a11y tests on the draft-inclusive test build. `ci-ok` fails if any of them failed or was skipped.
   - `security.yml`: `npm audit --audit-level=high` on lockfile changes and weekly.
   - `workflows-lint.yml`: actionlint and zizmor on changes under `.github/`.
-- The deploy job is off and only contains an outline. To enable it: add the provider steps and the `production` environment secrets, then create the repository variable `DEPLOY_ENABLED=true`.
-- GitHub settings to enable manually: Dependabot alerts and Dependabot security updates; branch protection (or a ruleset) on `main` requiring the `ci-ok` status check, so a pull request cannot be merged unless `astro check`, the build and `check:embargo` passed.
+- GitHub settings to enable manually: Dependabot alerts and Dependabot security updates; branch protection (or a ruleset) on `main` requiring the `ci-ok` status check, so a pull request cannot be merged unless `astro check`, the Nix build and `check:drafts` passed.
 
 ## Yearly maintenance
 
 - Renew security.txt: update `securityTxt.expires` in `src/config/site.ts`. The build warns when fewer than 30 days remain and fails once it has expired. Keep the value under one year ahead. Also replace `public/pgp-key.txt` (currently a `TODO` placeholder) with the real ASCII-armored public key, and update it when the key changes.
-- Review and merge Dependabot pull requests (`.github/dependabot.yml`: npm and GitHub Actions, weekly, grouped, versions younger than 7 days skipped).
+- Review and merge Dependabot pull requests (`.github/dependabot.yml`: npm and GitHub Actions, weekly, grouped, versions younger than 7 days skipped). `flake.lock` is not covered: run `nix flake update` by hand.
 - Re-run the manual accessibility checklist and update the accessibility statement date.
 
 ## Commit convention

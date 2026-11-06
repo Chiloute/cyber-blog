@@ -1,24 +1,23 @@
-// Fails (exit 1) if any non-publishable content (draft / future publishAfter) leaks into dist/.
+// Fails (exit 1) if any draft content leaks into dist/.
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { join, basename } from 'node:path';
 
 const DIST = 'dist';
-const CANARIES = ['EMBARGO-CANARY-7f3a', 'DRAFT-CANARY-91c2'];
+const CANARIES = ['DRAFT-CANARY-91c2'];
 
 if (!existsSync(DIST)) {
-  console.error('check-embargo: dist/ is missing, run `npm run build` first');
+  console.error('check-drafts: dist/ is missing, run `npm run build` first');
   process.exit(1);
 }
 
-// Same rule as src/lib/publishable.ts: draft === true or publishAfter > now.
+// Same rule as src/lib/publishable.ts: draft === true.
 // shortcut: regex frontmatter parse (top-level scalar lines only), upgrade if frontmatter gets multi-line values.
 function field(fm, key) {
   const m = new RegExp(`^${key}:\\s*(.*?)\\s*$`, 'm').exec(fm);
   return m ? m[1].replace(/^(["'])(.*)\1$/, '$2') : undefined;
 }
 
-const now = new Date();
 const needles = new Set(CANARIES);
 const blocked = [];
 for (const dir of ['writeups', 'notes', 'projects']) {
@@ -26,8 +25,7 @@ for (const dir of ['writeups', 'notes', 'projects']) {
   if (!existsSync(base)) continue;
   for (const f of readdirSync(base).filter((n) => n.endsWith('.mdx'))) {
     const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(join(base, f), 'utf8'))?.[1] ?? '';
-    const pa = field(fm, 'publishAfter');
-    if (field(fm, 'draft') === 'true' || (pa && new Date(pa) > now)) {
+    if (field(fm, 'draft') === 'true') {
       const slug = basename(f, '.mdx');
       const title = field(fm, 'title');
       blocked.push(`${dir}/${slug}`);
@@ -61,9 +59,9 @@ for (const p of walk(DIST)) {
   }
 }
 
-console.log(`check-embargo: ${blocked.length} non-publishable entries (${blocked.join(', ') || 'none'}), ${files} files scanned`);
+console.log(`check-drafts: ${blocked.length} draft entries (${blocked.join(', ') || 'none'}), ${files} files scanned`);
 if (leaks.length) {
   console.error(`LEAKS FOUND (${leaks.length}):\n${leaks.join('\n')}`);
   process.exit(1);
 }
-console.log('check-embargo: OK, no leaks');
+console.log('check-drafts: OK, no leaks');

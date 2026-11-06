@@ -1,6 +1,6 @@
 # Security and cache policy
 
-This document explains every security and cache directive the site sends, why it is there, and how to reproduce it on Vercel and Nginx. The hosting provider is not chosen yet. The reference configuration is `public/_headers` and `public/_redirects`, which both Cloudflare Pages and Netlify read natively. Astro copies `public/` verbatim into `dist/`.
+This document explains every security and cache directive the site sends, why it is there, and how to reproduce it on Vercel and Nginx. Production is self-hosted behind nginx (see the Nginx section and the README Deployment section). The reference configuration is `public/_headers` and `public/_redirects`, which both Cloudflare Pages and Netlify read natively. Astro copies `public/` verbatim into `dist/`.
 
 ## Threat model
 
@@ -87,7 +87,7 @@ No suffix-splat pattern (such as `/*.xml`) is used: it is not reliably supported
 - `package-lock.json` is committed and used with `npm ci` in builds, so installed versions are reproducible.
 - `npm audit --audit-level=high` runs in `.github/workflows/security.yml` (lockfile changes and weekly). At the time of writing it reports 2 moderate issues, both through `@tailwindcss/typography` → `postcss-selector-parser`. The only fix offered is a downgrade, so they are accepted and tracked in `docs/api-verification.md`.
 - Dependabot updates npm and GitHub Actions weekly, with a 7-day cooldown on new versions.
-- GitHub Actions in CI are pinned to full commit SHAs, not tags. Workflows default to `permissions: {}`, `npm ci` runs with `--ignore-scripts`, and the `GH_PROJECTS_TOKEN` secret is never given to pull request builds.
+- GitHub Actions in CI are pinned to full commit SHAs, not tags. Workflows default to `permissions: {}` and `npm ci` runs with `--ignore-scripts`. CI holds no secrets: the production build is the offline `nix build`.
 
 ## No source maps
 
@@ -204,7 +204,7 @@ None of the host configurations in this document (`public/_headers`, `public/_re
 5. **Feeds**: validate `/rss.xml` with the W3C Feed Validator (`https://validator.w3.org/feed/`). Confirm `Content-Type: application/rss+xml; charset=utf-8`.
 6. **Sitemap**: validate `/sitemap-index.xml` and one `sitemap-0.xml` (sitemaps.org schema, all URLs return 200). Confirm `/sitemap.xml` returns `301` to `/sitemap-index.xml`.
 7. **Rich Results Test** (`https://search.google.com/test/rich-results`): run on one post and on the home page. JSON-LD must be valid.
-8. **Embargo check**: `npm run check:embargo` must pass before publishing (content that is not yet publishable must not appear in the build).
+8. **Drafts check**: `npm run check:drafts` must pass before publishing (draft content must not appear in the build). The Nix build runs it.
 9. **Accessibility in both themes**: run `npm run test:a11y` (axe via Playwright) with light and dark themes. No serious or critical violations.
 10. **HSTS preload** (last, and only once HTTPS is confirmed):
     - Confirm HTTPS works on the apex domain and on every subdomain that will ever be used, with a valid certificate, and that HTTP redirects to HTTPS.
