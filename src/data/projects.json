@@ -1,0 +1,28 @@
+{
+  "_comment": "Featured projects, in display order. Edited by hand: the production build is offline, so nothing is fetched from GitHub. PLACEHOLDER data, replace with real values.",
+  "projects": [
+    {
+      "repo": "chiloute/example-repo-1",
+      "description": "Placeholder description for example-repo-1.",
+      "homepage": null,
+      "stars": 0,
+      "languages": [
+        "TypeScript",
+        "Python"
+      ],
+      "updatedAt": "2026-01-01T00:00:00Z",
+      "license": "MIT"
+    },
+    {
+      "repo": "chiloute/example-repo-2",
+      "description": "Placeholder description for example-repo-2.",
+      "homepage": null,
+      "stars": 0,
+      "languages": [
+        "Rust"
+      ],
+      "updatedAt": "2026-01-01T00:00:00Z",
+      "license": "MIT"
+    }
+  ]
+}

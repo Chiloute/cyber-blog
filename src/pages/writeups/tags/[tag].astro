@@ -21,7 +21,7 @@ const { tag, entries } = Astro.props;
   breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Writeups', path: '/writeups/' }, { name: `Tag: ${tag}`, path: `/writeups/tags/${encodeURIComponent(tag)}/` }]}
 >
   <PageHeader kicker={`$ grep -l "#${tag}" ~/writeups`} title={`Writeups tagged “${tag}”`}>
-    <p class="mt-3"><a href="/writeups/" class="font-mono text-sm">← All writeups</a></p>
+    <p class="mt-3"><a href="/writeups/" class="font-mono text-sm"><span aria-hidden="true">← </span>All writeups</a></p>
   </PageHeader>
   <ul class="log mt-8">
     {entries.map((e) => (

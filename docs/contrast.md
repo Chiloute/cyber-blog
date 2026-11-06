@@ -31,7 +31,7 @@ Badges carry text; color is only a supplement. Syntax highlighting is checked se
 | badge cat-misc / bg | `#55555d` | `#f7f6f3` | 6.83 | 4.5 | yes |
 | badge diff-easy / bg | `#1d5a8a` | `#f7f6f3` | 6.74 | 4.5 | yes |
 | badge diff-medium / bg | `#8a5a00` | `#f7f6f3` | 5.48 | 4.5 | yes |
-| badge diff-hard / bg | `#b43e00` | `#f7f6f3` | 5.35 | 4.5 | yes |
+| badge diff-hard / bg | `#ab3b00` | `#f7f6f3` | 5.79 | 4.5 | yes |
 | badge diff-insane / bg | `#b0121c` | `#f7f6f3` | 6.59 | 4.5 | yes |
 | text / code-bg | `#18181b` | `#eae8e3` | 14.47 | 4.5 | yes |
 | muted / code-bg | `#55555d` | `#eae8e3` | 6.03 | 4.5 | yes |
@@ -48,8 +48,19 @@ Badges carry text; color is only a supplement. Syntax highlighting is checked se
 | badge cat-misc / surface | `#55555d` | `#ecebe7` | 6.19 | 4.5 | yes |
 | badge diff-easy / surface | `#1d5a8a` | `#ecebe7` | 6.11 | 4.5 | yes |
 | badge diff-medium / surface | `#8a5a00` | `#ecebe7` | 4.97 | 4.5 | yes |
-| badge diff-hard / surface | `#b43e00` | `#ecebe7` | 4.85 | 4.5 | yes |
+| badge diff-hard / surface | `#ab3b00` | `#ecebe7` | 5.24 | 4.5 | yes |
 | badge diff-insane / surface | `#b0121c` | `#ecebe7` | 5.97 | 4.5 | yes |
+| badge cat-web / highlight-bg | `#1d5a8a` | `#f6dfc9` | 5.66 | 4.5 | yes |
+| badge cat-crypto / highlight-bg | `#6a3d9e` | `#f6dfc9` | 5.88 | 4.5 | yes |
+| badge cat-pwn / highlight-bg | `#b0121c` | `#f6dfc9` | 5.53 | 4.5 | yes |
+| badge cat-reverse / highlight-bg | `#8a4a00` | `#f6dfc9` | 5.33 | 4.5 | yes |
+| badge cat-forensic / highlight-bg | `#1b673a` | `#f6dfc9` | 5.35 | 4.5 | yes |
+| badge cat-osint / highlight-bg | `#00676a` | `#f6dfc9` | 5.18 | 4.5 | yes |
+| badge cat-misc / highlight-bg | `#55555d` | `#f6dfc9` | 5.74 | 4.5 | yes |
+| badge diff-easy / highlight-bg | `#1d5a8a` | `#f6dfc9` | 5.66 | 4.5 | yes |
+| badge diff-medium / highlight-bg | `#8a5a00` | `#f6dfc9` | 4.61 | 4.5 | yes |
+| badge diff-hard / highlight-bg | `#ab3b00` | `#f6dfc9` | 4.86 | 4.5 | yes |
+| badge diff-insane / highlight-bg | `#b0121c` | `#f6dfc9` | 5.53 | 4.5 | yes |
 
 ## Dark theme
 
@@ -97,6 +108,17 @@ Badges carry text; color is only a supplement. Syntax highlighting is checked se
 | badge diff-medium / surface | `#f5c542` | `#151518` | 11.24 | 4.5 | yes |
 | badge diff-hard / surface | `#ff8c42` | `#151518` | 7.88 | 4.5 | yes |
 | badge diff-insane / surface | `#ff5a63` | `#151518` | 5.98 | 4.5 | yes |
+| badge cat-web / highlight-bg | `#82c0ff` | `#3d2611` | 7.37 | 4.5 | yes |
+| badge cat-crypto / highlight-bg | `#c9a6f5` | `#3d2611` | 6.91 | 4.5 | yes |
+| badge cat-pwn / highlight-bg | `#ff7a82` | `#3d2611` | 5.63 | 4.5 | yes |
+| badge cat-reverse / highlight-bg | `#ffb04a` | `#3d2611` | 7.79 | 4.5 | yes |
+| badge cat-forensic / highlight-bg | `#6fd69a` | `#3d2611` | 7.93 | 4.5 | yes |
+| badge cat-osint / highlight-bg | `#6fd8d8` | `#3d2611` | 8.42 | 4.5 | yes |
+| badge cat-misc / highlight-bg | `#9e9da5` | `#3d2611` | 5.27 | 4.5 | yes |
+| badge diff-easy / highlight-bg | `#82c0ff` | `#3d2611` | 7.37 | 4.5 | yes |
+| badge diff-medium / highlight-bg | `#f5c542` | `#3d2611` | 8.73 | 4.5 | yes |
+| badge diff-hard / highlight-bg | `#ff8c42` | `#3d2611` | 6.12 | 4.5 | yes |
+| badge diff-insane / highlight-bg | `#ff5a63` | `#3d2611` | 4.65 | 4.5 | yes |
 
 ## Syntax highlighting
 

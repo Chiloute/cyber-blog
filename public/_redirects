@@ -1,2 +1,0 @@
-# Sitemap entry point: @astrojs/sitemap writes sitemap-index.xml, not sitemap.xml.
-/sitemap.xml /sitemap-index.xml 301

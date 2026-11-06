@@ -89,14 +89,14 @@ src/
   components/    Astro components; mdx/ holds Callout, Flag, Terminal, Spoiler
   layouts/       BaseLayout, PostLayout, LegalLayout
   pages/         routes, RSS, OG images, robots.txt, .well-known/security.txt
-  lib/           publishable, github, jsonld, dates, warn-config, ...
+  lib/           publishable, projects, feeds, jsonld, dates, warn-config, ...
   integrations/  shiki-css.mjs
   scripts/       client scripts (theme, filters, search, copy, flag, ...)
-  data/          projects.fallback.json
+  data/          projects.json (featured projects)
 scripts/         check-drafts, check-contrast, generate-icons
 tests/           Playwright specs
 docs/            security, contrast, api-verification, manual a11y checklist
-public/          static files, including _headers and _redirects
+public/          static files (icons, pgp-key.txt, humans.txt)
 .github/         CI workflows, shared setup action, Dependabot
 ```
 
@@ -104,7 +104,7 @@ public/          static files, including _headers and _redirects
 
 ### Contact email
 
-Set `CONTACT_EMAIL` in `src/config/site.ts` (it is `TODO@example.invalid` until then). While it is the placeholder, `npm run build` prints a warning (`src/lib/warn-config.ts`). It is used in:
+Set `CONTACT_EMAIL` in `src/config/site.ts` (it is `TODO@example.invalid` until then). While it is the placeholder, the build prints a warning (`src/lib/warn-config.ts`). The same applies to the host details and `public/pgp-key.txt`. It is used in:
 
 - `ContactEmail` component (obfuscated, assembled client-side by `src/scripts/email.ts`), shown on the legal notice, privacy, accessibility and about pages and in the footer;
 - `/.well-known/security.txt` (`src/pages/.well-known/security.txt.ts`).
@@ -113,7 +113,7 @@ The JSON-LD (`src/lib/jsonld.ts`) does not currently include the email.
 
 ### Domain and other constants
 
-`SITE_URL`, `AUTHOR`, `SITE_TITLE`, `SITE_DESCRIPTION` in `src/config/site.ts`. `SITE_URL` feeds Astro's `site`, the sitemap, feeds and canonical URLs. Also in `site.ts`, each marked `TODO`:
+`SITE_URL`, `AUTHOR`, `SITE_DESCRIPTION` in `src/config/site.ts`. `SITE_URL` feeds Astro's `site`, the sitemap, feeds and canonical URLs. Also in `site.ts`, each marked `TODO`:
 
 - `socialLinks`: confirm the GitHub URL.
 - `ctfProfiles`: set `url` and `enabled: true` per platform (Root-Me, HackTheBox, TryHackMe, CTFtime).
@@ -149,9 +149,6 @@ From `src/content.config.ts`:
 | `tags` | array of strings | no | `[]` |
 | `team` | string | no | |
 | `draft` | boolean | no | `false` |
-| `cover` | object `{ image, alt, decorative }` | no | |
-
-`cover` sub-fields: `image` is an Astro image (relative path), `alt` is a required string, `decorative` is a boolean defaulting to `false`. An empty `alt` is only valid with `decorative: true`; otherwise the build fails. The schema accepts `cover`, but no page renders it at the moment (only the schema references it).
 
 ### Drafts
 
@@ -161,7 +158,7 @@ From `src/content.config.ts`:
 ### Body
 
 - Start headings at `h2` (`##`); the page title is the `h1`.
-- Images and covers need alt text; use `decorative: true` only for purely decorative covers.
+- Images need alt text (`alt=""` only for purely decorative ones).
 - Import the components at the top of the file, after the frontmatter:
 
 ```mdx
@@ -216,30 +213,22 @@ Same body rules as writeups. Example: `src/content/notes/linux-privesc-cheatshee
 
 ## Adding a project
 
-1. Add `owner/name` to `featuredRepos` in `src/config/projects.ts`.
-2. Add a fallback entry under the same key in `src/data/projects.fallback.json` (`description`, `homepage`, `stars`, `languages`, `updatedAt`, `license`). It is used when the GitHub API is unavailable; fetching never fails the build (`src/lib/github.ts`).
-3. Optional: enrich the project page with `src/content/projects/<repo-name>.mdx` (file name = repository name). Frontmatter:
+1. Add an entry to `projects` in `src/data/projects.json` (display order = file order): `repo` (`owner/name`), `description`, `homepage`, `stars`, `languages`, `updatedAt`, `license`. The file is edited by hand: the production build runs offline, so nothing is fetched from GitHub.
+2. Optional: enrich the project page with `src/content/projects/<repo-name>.mdx` (file name = repository name; the build warns when no project matches). Frontmatter:
 
 | Field | Type | Required |
 |---|---|---|
-| `repo` | string matching `owner/name` | yes |
 | `draft` | boolean, default `false` (hidden from `npm run build`, shown in `npm run dev`) | no |
 | `title` | string | no |
-| `demo` | URL | no |
-| `cover` | `{ image, alt, decorative }`, same rules as writeups | no |
 
 Example: `src/content/projects/example-repo-1.mdx`.
-
-### GitHub token
-
-Without a token the build uses unauthenticated API calls (rate limited) and falls back to the JSON data. For reliable data, create a fine-grained personal access token, read-only, public repositories only. The production build (`nix build`) runs without network, so it always uses `src/data/projects.fallback.json`: refresh that file when the projects change. Locally, put `GITHUB_TOKEN=...` in `.env` (git-ignored; `.env.example` documents the variable). Never commit it. The variable is declared server-side and secret in `astro.config.mjs`, so it cannot reach client code.
 
 ## Security
 
 Summary (full rationale and host equivalents in `docs/security.md`):
 
-- CSP in two parts: a `<meta>` policy generated by Astro (`security.csp`, hashed inline scripts and styles, `'wasm-unsafe-eval'` for Pagefind) and a header policy in `public/_headers` (`frame-ancestors`, `connect-src`, `object-src`, and so on).
-- Other headers in `public/_headers`: HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, COOP, CORP, X-Frame-Options. `public/_redirects` redirects `/sitemap.xml` to `/sitemap-index.xml`.
+- CSP in two parts: a `<meta>` policy generated by Astro (`security.csp`, hashed inline scripts and styles, `'wasm-unsafe-eval'` for Pagefind) and a header policy sent by nginx (`frame-ancestors`, `connect-src`, `object-src`, and so on).
+- Other headers, also sent by nginx: HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, COOP, CORP, X-Frame-Options. All of them, the cache rules and the `/sitemap.xml` redirect live in one place: `serverBlock` in `flake.nix`, checked with `nginx -t` by `nix flake check`.
 - No inline styles and no `unsafe-inline`: Shiki output is converted to classes.
 - No source maps (`vite.build.sourcemap: false`).
 - Drafts check: `npm run check:drafts`.
@@ -256,7 +245,7 @@ The target is WCAG 2.2 AA in both themes (see `/accessibility/`, `src/pages/acce
 
 The site is self-hosted: a NixOS container on the server builds the flake and serves `dist/` with nginx, exposed through a Cloudflare Tunnel (TLS at Cloudflare). There is no deploy job in CI.
 
-- `packages.default` in `flake.nix` is the production `dist/`: `npm ci --ignore-scripts` from `package-lock.json` (`importNpmLock`, no npm hash to maintain), `npm run build`, then `npm run check:drafts`. Build it with `nix build github:Chiloute/cyber-blog`. It runs offline (see GitHub token).
+- `packages.default` in `flake.nix` is the production `dist/`: `npm ci --ignore-scripts` from `package-lock.json` (`importNpmLock`, no npm hash to maintain), `npm run build`, then `npm run check:drafts`. Build it with `nix build github:Chiloute/cyber-blog`. It runs offline.
 - Minimal container on the server's flake (inputs: `blog.url = "github:Chiloute/cyber-blog";`):
 
   ```nix
@@ -266,20 +255,13 @@ The site is self-hosted: a NixOS container on the server builds the flake and se
     hostAddress = "10.233.1.1";
     localAddress = "10.233.1.2"; # cloudflared on the host points to http://10.233.1.2:80
     config = {
+      imports = [ inputs.blog.nixosModules.default ]; # nginx: site, headers, cache, redirects
       networking.firewall.allowedTCPPorts = [ 80 ];
-      services.nginx = {
-        enable = true;
-        virtualHosts."chiloute.fr" = {
-          root = inputs.blog.packages.x86_64-linux.default;
-          extraConfig = "error_page 404 /404.html;";
-          # Security and cache headers: copy the Nginx section of docs/security.md.
-        };
-      };
     };
   };
   ```
 - Update: `nix flake update blog && nixos-rebuild switch` on the server. Nothing changes on the server without that step.
-- Headers: nginx ignores `public/_headers` and `public/_redirects`, and Cloudflare Tunnel adds none. The nginx configuration must carry them (Nginx section of `docs/security.md`).
+- Headers: Cloudflare Tunnel adds none; `nixosModules.default` brings them with the site, so they change with each `nix flake update blog`.
 - CI workflows (`.github/workflows/`):
   - `ci.yml` (pull requests, pushes to `main`): `static` (lint, `astro check`, unit tests, `check:contrast`) must pass before `nix` and `e2e` start. `nix` runs `nix flake check`, which builds `packages.default` exactly as the server does (with `check:drafts`) and runs the cheap git hooks. `e2e` runs the Playwright a11y tests on the draft-inclusive test build. `ci-ok` fails if any of them failed or was skipped.
   - `security.yml`: `npm audit --audit-level=high` on lockfile changes and weekly.

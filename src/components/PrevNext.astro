@@ -8,13 +8,13 @@ const card = 'block rounded-lg border border-border p-4 no-underline hover:borde
   <nav aria-label={`More ${kind}s`} class="mt-16 grid gap-4 sm:grid-cols-2">
     {prev ? (
       <a href={prev.href} rel="prev" class={card}>
-        <span class="kicker block">← Previous {kind}</span>
+        <span class="kicker block"><span aria-hidden="true">← </span>Previous {kind}</span>
         <span class="mt-1 block font-semibold text-text">{prev.title}</span>
       </a>
     ) : <span />}
     {next && (
       <a href={next.href} rel="next" class:list={[card, 'sm:text-right']}>
-        <span class="kicker block">Next {kind} →</span>
+        <span class="kicker block">Next {kind}<span aria-hidden="true"> →</span></span>
         <span class="mt-1 block font-semibold text-text">{next.title}</span>
       </a>
     )}

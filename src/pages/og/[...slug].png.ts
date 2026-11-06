@@ -1,17 +1,16 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { getPublished } from '../../lib/publishable';
 import { renderOg } from '../../lib/og';
-
-const fmt = (d: Date) => d.toISOString().slice(0, 10);
+import { isoDate } from '../../lib/dates';
 
 export const getStaticPaths = (async () => {
   const writeups = (await getPublished('writeups')).map((e) => ({
     params: { slug: `writeups/${e.id}` },
-    props: { title: e.data.title, kicker: `${e.data.category} · ${e.data.difficulty}`, meta: `${e.data.ctf} · ${fmt(e.data.date)}` },
+    props: { title: e.data.title, kicker: `${e.data.category} · ${e.data.difficulty}`, meta: `${e.data.ctf} · ${isoDate(e.data.date)}` },
   }));
   const notes = (await getPublished('notes')).map((e) => ({
     params: { slug: `notes/${e.id}` },
-    props: { title: e.data.title, kicker: 'note', meta: fmt(e.data.date) },
+    props: { title: e.data.title, kicker: 'note', meta: isoDate(e.data.date) },
   }));
   return [...writeups, ...notes];
 }) satisfies GetStaticPaths;

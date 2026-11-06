@@ -1,7 +1,7 @@
 ---
 import ExternalLink from './ExternalLink.astro';
 import { formatDate } from '../lib/dates.ts';
-import type { Project } from '../lib/github.ts';
+import type { Project } from '../lib/projects.ts';
 
 interface Props {
   project: Project;
@@ -15,6 +15,7 @@ interface Props {
 const { project: p, level = 2, hasDetails = false, compact = false } = Astro.props;
 const Heading = `h${level}` as 'h2' | 'h3';
 const full = `${p.owner}/${p.name}`;
+const stars = new Intl.NumberFormat('en-US').format(p.stars);
 ---
 
 <article class:list={['flex h-full flex-col gap-3 rounded-lg border border-border bg-bg hover:border-border-ui', compact ? 'p-4' : 'p-5']}>
@@ -24,7 +25,7 @@ const full = `${p.owner}/${p.name}`;
     </Heading>
     <span class="flex shrink-0 items-center gap-1 font-mono text-xs text-muted">
       <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" width="12" height="12" fill="currentColor"><path d="M8 1l2.1 4.3 4.7.7-3.4 3.3.8 4.7L8 11.8 3.8 14l.8-4.7L1.2 6l4.7-.7z"></path></svg>
-      {p.stars} <span class="sr-only">{p.stars === 1 ? 'star' : 'stars'}</span>
+      {stars} <span class="sr-only">{p.stars === 1 ? 'star' : 'stars'}</span>
     </span>
   </div>
   {p.description && <p class="m-0 text-[0.9375rem] text-muted">{p.description}</p>}

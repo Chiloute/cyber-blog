@@ -2,14 +2,16 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import { getProjects } from '../../lib/github.ts';
-import { showDrafts } from '../../lib/publishable.ts';
+import { projects } from '../../lib/projects.ts';
+import { isPublishable, showDrafts } from '../../lib/publishable.ts';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const [projects, entries] = await Promise.all([getProjects(), getCollection('projects', (e) => showDrafts() || !e.data.draft)]);
+  const entries = await getCollection('projects', (e) => isPublishable(e.data, showDrafts()));
   return entries.flatMap((entry) => {
     const project = projects.find((p) => p.slug === entry.id);
+    // The file name links the page to its repo: a mismatch would silently drop the page.
+    if (!project) console.warn(`[projects] ${entry.id}.mdx: no "*/${entry.id}" repo in src/data/projects.json, page skipped`);
     return project ? [{ params: { slug: entry.id }, props: { entry, project } }] : [];
   });
 }
@@ -23,7 +25,7 @@ const title = entry.data.title ?? project.name;
   title={title}
   description={project.description || `Details about ${project.name}.`}
   pagefindBody
-  breadcrumbs={[{ name: 'Projects', path: '/projects/' }, { name: title, path: `/projects/${entry.id}/` }]}
+  breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Projects', path: '/projects/' }, { name: title, path: `/projects/${entry.id}/` }]}
 >
   <PageHeader kicker={`~/projects/${entry.id}`} title={title} />
   <div class="my-8 max-w-xl"><ProjectCard project={project} level={2} /></div>

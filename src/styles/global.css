@@ -40,7 +40,7 @@
   --cat-misc: #55555d;
   --diff-easy: #1d5a8a;
   --diff-medium: #8a5a00;
-  --diff-hard: #b43e00;
+  --diff-hard: #ab3b00;
   --diff-insane: #b0121c;
 }
 
@@ -115,7 +115,13 @@
     scroll-behavior: smooth;
     scroll-padding-top: 1.5rem;
     -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     font-kerning: normal;
+  }
+  /* Mobile: keep focused/scrolled-to elements clear of the fixed .to-top link (WCAG 2.4.11). */
+  @media (max-width: 47.99rem) {
+    html { scroll-padding-bottom: 4rem; }
   }
   body {
     min-width: 0;

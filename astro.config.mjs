@@ -1,4 +1,4 @@
-import { defineConfig, envField } from 'astro/config';
+import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
@@ -53,11 +53,6 @@ export default defineConfig({
     csp: {
       // Resources replace the defaults, so 'self' must be repeated. Needed by Pagefind (WebAssembly).
       scriptDirective: { resources: ["'self'", "'wasm-unsafe-eval'"] },
-    },
-  },
-  env: {
-    schema: {
-      GITHUB_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
     },
   },
 });

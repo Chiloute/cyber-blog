@@ -28,7 +28,7 @@ const Heading = `h${level}` as 'h2' | 'h3';
     <p class="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 sm:col-start-2 lg:col-start-3 lg:flex-col lg:items-end lg:pt-1">
       {category && <Badge kind="category" value={category} />}
       {difficulty && <Badge kind="difficulty" value={difficulty} />}
-      <span class="font-mono text-xs text-muted">{ctf ? `${ctf} · ` : ''}{readingMinutes} min</span>
+      <span class="font-mono text-xs text-muted">{ctf ? `${ctf} · ` : ''}{readingMinutes}&nbsp;min</span>
     </p>
   </article>
 </li>

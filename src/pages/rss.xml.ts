@@ -1,30 +1,11 @@
-import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { getPublished } from '../lib/publishable.ts';
-import { SITE_DESCRIPTION } from '../config/site.ts';
+import { feed, noteItem, writeupItem } from '../lib/feeds.ts';
 
-// Summaries only: MDX components (Flag, Spoiler) would be lost or leak in feed readers.
-export async function GET(context: APIContext) {
-  const writeups = (await getPublished('writeups')).map((e) => ({
-    title: e.data.title,
-    description: e.data.description,
-    pubDate: e.data.date,
-    link: new URL(`/writeups/${e.id}/`, context.site).href,
-    categories: [e.data.category, ...e.data.tags],
-  }));
-  const notes = (await getPublished('notes')).map((e) => ({
-    title: e.data.title,
-    description: e.data.description,
-    pubDate: e.data.date,
-    link: new URL(`/notes/${e.id}/`, context.site).href,
-    categories: e.data.tags,
-  }));
-  const items = [...writeups, ...notes].sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
-  return rss({
-    title: 'chiloute — All',
-    description: SITE_DESCRIPTION,
-    site: context.site!,
-    items,
-    customData: '<language>en-us</language>',
-  });
+export async function GET({ site }: APIContext) {
+  const items = [
+    ...(await getPublished('writeups')).map(writeupItem(site!)),
+    ...(await getPublished('notes')).map(noteItem(site!)),
+  ].sort((a, b) => b.pubDate!.getTime() - a.pubDate!.getTime());
+  return feed(site!, 'All', items);
 }

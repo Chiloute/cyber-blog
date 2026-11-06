@@ -8,14 +8,14 @@ import PageHeader from '../components/PageHeader.astro';
   <form id="search-form" role="search" aria-label="Site search" class="my-8 flex max-w-3xl flex-wrap items-end gap-3">
     <div class="flex grow flex-col gap-1">
       <label for="search-input" class="kicker">Search writeups, notes and projects</label>
-      <input id="search-input" name="q" type="search" autocomplete="off" class="min-h-11 w-full rounded-md border border-border-ui bg-bg px-3 font-mono text-text" />
+      <input id="search-input" name="q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" class="min-h-11 w-full rounded-md border border-border-ui bg-bg px-3 font-mono text-text" />
     </div>
     <button type="submit" class="btn min-h-11 px-4">Search</button>
   </form>
   <div id="search-status" role="status" aria-live="polite" class="font-mono text-sm text-muted"></div>
   <ol id="search-results" class="log mt-4 max-w-3xl"></ol>
   <noscript>
-    <p>Search requires JavaScript. Browse <a href="/writeups">writeups</a> and <a href="/notes">notes</a> instead.</p>
+    <p>Search requires JavaScript. Browse <a href="/writeups/">writeups</a> and <a href="/notes/">notes</a> instead.</p>
   </noscript>
   <script>
     import '../scripts/search.ts';

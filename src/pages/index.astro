@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPublished } from '../lib/publishable.ts';
-import { getProjects } from '../lib/github.ts';
+import { projects as allProjects } from '../lib/projects.ts';
 import { readingMinutes } from '../lib/reading-time.ts';
 import { formatDate } from '../lib/dates.ts';
 
@@ -11,7 +11,7 @@ const allWriteups = await getPublished('writeups');
 const allNotes = await getPublished('notes');
 const writeups = allWriteups.slice(0, 5);
 const notes = allNotes.slice(0, 3);
-const projects = (await getProjects()).slice(0, 3);
+const projects = allProjects.slice(0, 3);
 const categories = [...new Set(allWriteups.map((e) => e.data.category))];
 const last = [...allWriteups, ...allNotes].map((e) => e.data.updated ?? e.data.date).sort((a, b) => b.getTime() - a.getTime())[0];
 const facts: [string, string][] = [
@@ -53,7 +53,7 @@ const more = 'font-mono text-sm text-accent no-underline hover:underline';
         <p class="kicker m-0" aria-hidden="true">~/writeups</p>
         <h2 id="h-writeups" class="mt-1 text-2xl font-semibold">Latest writeups</h2>
       </div>
-      <a href="/writeups/" class={more}>All writeups →</a>
+      <a href="/writeups/" class={more}>All writeups<span aria-hidden="true"> →</span></a>
     </div>
     {writeups.length === 0 ? <p class="mt-4 text-muted">No writeups published yet.</p> : (
       <ul class="log mt-5">
@@ -75,7 +75,7 @@ const more = 'font-mono text-sm text-accent no-underline hover:underline';
           <p class="kicker m-0" aria-hidden="true">~/notes</p>
           <h2 id="h-notes" class="mt-1 text-2xl font-semibold">Notes</h2>
         </div>
-        <a href="/notes/" class={more}>All notes →</a>
+        <a href="/notes/" class={more}>All notes<span aria-hidden="true"> →</span></a>
       </div>
       {notes.length === 0 ? <p class="mt-4 text-muted">No notes published yet.</p> : (
         <ul class="log mt-5">
@@ -97,7 +97,7 @@ const more = 'font-mono text-sm text-accent no-underline hover:underline';
           <p class="kicker m-0" aria-hidden="true">~/projects</p>
           <h2 id="h-projects" class="mt-1 text-2xl font-semibold">Projects</h2>
         </div>
-        <a href="/projects/" class={more}>All projects →</a>
+        <a href="/projects/" class={more}>All projects<span aria-hidden="true"> →</span></a>
       </div>
       {projects.length === 0 ? <p class="mt-4 text-muted">No projects to show yet.</p> : (
         <ul class="mt-5 grid list-none gap-3 p-0">
