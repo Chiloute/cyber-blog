@@ -1,0 +1,8 @@
+/* TEAM */
+Author: chiloute
+Site: https://chiloute.fr
+
+/* SITE */
+Standards: HTML5, CSS
+Components: Astro, Tailwind CSS, Shiki, Pagefind
+Language: English

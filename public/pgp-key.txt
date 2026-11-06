@@ -1,0 +1,1 @@
+TODO: replace with the ASCII-armored public key of the contact address.
