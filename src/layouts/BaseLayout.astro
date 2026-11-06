@@ -23,12 +23,17 @@ const { pagefindBody = false, ...seo } = Astro.props;
     <link rel="stylesheet" href={SHIKI_CSS_PATH} />
     <SEO {...seo} />
   </head>
-  <body class="flex min-h-screen flex-col">
+  <body id="top" class="flex min-h-screen flex-col">
     <SkipLink />
     <Header />
     <main id="main" tabindex="-1" class="shell flex-1 py-10 md:py-14" data-pagefind-body={pagefindBody ? '' : undefined}>
       <slot />
     </main>
     <Footer />
+    <!-- Mobile only. Fades in on scroll via a CSS scroll-driven animation (no JS); see .to-top in global.css. -->
+    <a href="#top" class="to-top md:hidden">
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" /></svg>
+      <span class="sr-only">Back to top</span>
+    </a>
   </body>
 </html>

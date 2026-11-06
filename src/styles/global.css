@@ -232,6 +232,50 @@
   }
   .redacted[hidden] { display: none; }
 
+  /* Back-to-top link (mobile). Visible by default: browsers without scroll-driven animations and
+     prefers-reduced-motion (animations disabled below) simply keep it shown. */
+  .to-top {
+    position: fixed;
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--border-ui);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+  }
+  .to-top:hover { color: var(--accent); border-color: var(--accent); }
+  /* Hidden until the reader has scrolled; also hidden on pages too short to scroll (inactive timeline). */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .to-top {
+        opacity: 0;
+        pointer-events: none;
+        animation-name: to-top-reveal;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+      }
+      /* Separate rule on purpose: the minifier would otherwise fold animation-timeline into the
+         `animation` shorthand, where it is not allowed, and the browser would drop the whole line. */
+      html .to-top {
+        animation-timeline: scroll(root);
+        animation-range: 0 30rem;
+      }
+    }
+  }
+  /* !important beats the animation: a focused link is never invisible (WCAG 2.4.7). */
+  .to-top:focus-visible { opacity: 1 !important; pointer-events: auto !important; }
+  @keyframes to-top-reveal {
+    0%, 40% { opacity: 0; pointer-events: none; }
+    100% { opacity: 0.9; pointer-events: auto; }
+  }
+
   /* Log-style list rows (writeups, notes). */
   .log { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
   .log > li { border-bottom: 1px solid var(--border); }

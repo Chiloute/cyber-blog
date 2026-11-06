@@ -78,3 +78,20 @@ test('reduced motion zeroes transitions', async ({ page }) => {
     expect(parseFloat(d)).toBeLessThan(0.01);
   }
 });
+
+test('back-to-top appears after scrolling on mobile and returns to the top', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/writeups/example-web-ssti/');
+  const link = page.getByRole('link', { name: 'Back to top' });
+  await expect(link).toHaveCSS('opacity', '0');
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect.poll(() => link.evaluate((el) => Number(getComputedStyle(el).opacity))).toBeGreaterThan(0.5);
+  await link.click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+});
+
+test('back-to-top is hidden on desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/writeups/example-web-ssti/');
+  await expect(page.getByRole('link', { name: 'Back to top' })).toBeHidden();
+});
