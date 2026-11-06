@@ -1,0 +1,9 @@
+---
+import { createHash } from 'node:crypto';
+
+// Astro does not hash is:inline scripts, so the hash is registered by hand (must match the emitted text exactly).
+const code = `(function(){var p='system';try{var s=localStorage.getItem('theme');if(s==='light'||s==='dark'||s==='system')p=s}catch(e){}var d=p==='system'?matchMedia('(prefers-color-scheme: dark)').matches:p==='dark';document.documentElement.dataset.theme=d?'dark':'light';document.documentElement.dataset.themePref=p})();`;
+Astro.csp?.insertScriptHash(`sha256-${createHash('sha256').update(code).digest('base64')}`);
+---
+
+<script is:inline set:html={code} />

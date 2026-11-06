@@ -1,0 +1,108 @@
+---
+import { AUTHOR, SITE_URL, themeColors } from '../config/site.ts';
+import { blogPostingJsonLd, breadcrumbJsonLd, personJsonLd, serializeJsonLd } from '../lib/jsonld.ts';
+import type { JsonLd } from '../lib/jsonld.ts';
+
+export interface SEOProps {
+  /** Page title. Final <title> is `${title} · chiloute`, except on the home page (title shown as is). */
+  title: string;
+  /** Meta description (required). */
+  description: string;
+  /** Absolute OG image URL. Default: /og-default.png on the site. */
+  ogImage?: string;
+  /** Alt text for the OG/Twitter image. */
+  ogImageAlt?: string;
+  /** 'article' enables article:* tags and BlogPosting JSON-LD. */
+  type?: 'website' | 'article';
+  /** ISO date or Date; article only. */
+  publishedTime?: Date | string;
+  modifiedTime?: Date | string;
+  tags?: string[];
+  /** Emit robots noindex. */
+  noindex?: boolean;
+  /** Extra JSON-LD objects, rendered in addition to the generated ones. */
+  jsonLd?: JsonLd | JsonLd[];
+  /** Breadcrumb trail; paths are made absolute. */
+  breadcrumbs?: { name: string; path: string }[];
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  ogImageAlt = 'chiloute',
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  tags = [],
+  noindex = false,
+  jsonLd = [],
+  breadcrumbs,
+} = Astro.props;
+
+const base = Astro.site ?? new URL(SITE_URL);
+const pathname = Astro.url.pathname;
+const canonical = new URL(pathname, base).href; // trailing slash follows the actual route
+const isHome = pathname === '/';
+const fullTitle = isHome ? title : `${title} · ${AUTHOR}`;
+const image = ogImage ?? new URL('/og-default.png', base).href;
+const iso = (d: Date | string): string => (d instanceof Date ? d.toISOString() : d);
+const published = publishedTime ? iso(publishedTime) : undefined;
+const modified = modifiedTime ? iso(modifiedTime) : undefined;
+
+const graph: JsonLd[] = [personJsonLd(base.href)];
+if (type === 'article' && published) {
+  graph.push(
+    blogPostingJsonLd(
+      { title, description, url: canonical, image, datePublished: published, dateModified: modified, tags },
+      base.href,
+    ),
+  );
+}
+if (breadcrumbs?.length) graph.push(breadcrumbJsonLd(breadcrumbs, base.href));
+graph.push(...(Array.isArray(jsonLd) ? jsonLd : [jsonLd]));
+// Not executed by browsers, so script-src does not apply. Astro's CSP hashing covers only
+// scripts it processes; this data block needs no hash (see NOTES).
+const json = serializeJsonLd(graph);
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:type" content={type} />
+<meta property="og:image" content={image} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:site_name" content={AUTHOR} />
+<meta property="og:locale" content="en_US" />
+{type === 'article' && published && <meta property="article:published_time" content={published} />}
+{type === 'article' && modified && <meta property="article:modified_time" content={modified} />}
+{type === 'article' && <meta property="article:author" content={AUTHOR} />}
+{type === 'article' && tags.map((t: string) => <meta property="article:tag" content={t} />)}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
+
+<meta name="theme-color" content={themeColors.light} media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content={themeColors.dark} media="(prefers-color-scheme: dark)" />
+
+<link rel="alternate" type="application/rss+xml" title={`${AUTHOR} (all)`} href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title={`${AUTHOR} (writeups)`} href="/writeups/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title={`${AUTHOR} (notes)`} href="/notes/rss.xml" />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="author" href="/humans.txt" />
+
+<script is:inline type="application/ld+json" set:html={json} />

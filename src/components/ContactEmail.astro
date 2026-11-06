@@ -1,0 +1,20 @@
+---
+import { CONTACT_EMAIL, isEmailPlaceholder } from '../config/site.ts';
+
+const rev = (s: string) => [...s].reverse().join('');
+const [user = '', domain = ''] = CONTACT_EMAIL.split('@');
+const fallback = `${user} [at] ${domain.replaceAll('.', ' [dot] ')}`;
+---
+
+{
+  isEmailPlaceholder() ? (
+    <span>Contact address coming soon</span>
+  ) : (
+    <>
+      <span data-email data-u={rev(user)} data-d={rev(domain)}>{fallback}</span>
+      <script>
+        import '../scripts/email.ts';
+      </script>
+    </>
+  )
+}

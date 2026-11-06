@@ -1,0 +1,21 @@
+---
+interface Props {
+  href: string;
+  newTab?: boolean;
+  class?: string;
+}
+const { href, newTab = false, class: className } = Astro.props;
+---
+
+<a href={href} rel="noopener noreferrer" target={newTab ? '_blank' : undefined} class={className}>
+  <slot />{
+    newTab && (
+      <>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" width="12" height="12" class="ml-1 inline" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 2h5v5M14 2 7 9M12 9v5H2V4h5" />
+        </svg>
+        <span class="sr-only">(opens in a new tab)</span>
+      </>
+    )
+  }
+</a>
