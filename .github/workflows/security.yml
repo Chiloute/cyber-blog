@@ -1,0 +1,29 @@
+name: Security
+
+# Dependency audit outside the main CI: a new advisory should not block unrelated PRs,
+# but PRs that touch the lockfile are still gated.
+on:
+  pull_request:
+    paths: [package.json, package-lock.json]
+  push:
+    branches: [main]
+    paths: [package.json, package-lock.json]
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # Gate on high/critical only: the current moderate advisory (postcss-selector-parser via
+      # @tailwindcss/typography) has only a downgrade fix. To tighten, change to --audit-level=moderate.
+      - run: npm audit --audit-level=high

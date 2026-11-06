@@ -5,6 +5,9 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    # Skip versions younger than 7 days: most malicious npm releases are pulled within that window.
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(deps)"
@@ -18,6 +21,9 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    # Skip versions younger than 7 days: most malicious npm releases are pulled within that window.
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     commit-message:
       prefix: "chore(deps)"

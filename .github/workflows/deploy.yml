@@ -1,0 +1,30 @@
+name: Deploy
+
+# Reusable: ships the `site` artifact built and verified earlier in the same run. Never rebuilds.
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  deploy:
+    # Off until a hosting provider is set up: create the repo variable DEPLOY_ENABLED=true to turn it on.
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      # deployments: write  # only if the provider action creates GitHub deployments
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: dist
+      # Outline for Cloudflare Pages (direct upload via wrangler), to be done when chosen:
+      #  npx wrangler pages deploy dist --project-name <name> --branch main
+      #  with environment secrets CLOUDFLARE_API_TOKEN (Pages:Edit only) and CLOUDFLARE_ACCOUNT_ID
+      - run: find dist -maxdepth 2 | head -50

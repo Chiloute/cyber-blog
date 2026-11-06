@@ -15,7 +15,17 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system nixpkgs.legacyPackages.${system});
 
       # Cheap, self-contained hooks: safe to run in the sandboxed `nix flake check`.
-      cheapHooks = {
+      cheapHooks = pkgs: {
+        # Same workflow linters as .github/workflows/workflows-lint.yml, caught before the push.
+        actionlint.enable = true;
+        zizmor = {
+          enable = true;
+          name = "zizmor";
+          entry = "${pkgs.zizmor}/bin/zizmor --offline .github";
+          language = "system";
+          pass_filenames = false;
+          files = "^\\.github/";
+        };
         check-merge-conflicts.enable = true;
         check-json = {
           enable = true;
@@ -57,15 +67,15 @@
         };
     in
     {
-      checks = forAllSystems (system: _pkgs: {
-        pre-commit-check = git-hooks.lib.${system}.run { src = ./.; hooks = cheapHooks; };
+      checks = forAllSystems (system: pkgs: {
+        pre-commit-check = git-hooks.lib.${system}.run { src = ./.; hooks = cheapHooks pkgs; };
       });
 
       devShells = forAllSystems (system: pkgs:
         let
           hooksRun = git-hooks.lib.${system}.run {
             src = ./.;
-            hooks = cheapHooks // npmHooks pkgs;
+            hooks = cheapHooks pkgs // npmHooks pkgs;
           };
         in {
           default = pkgs.mkShell {
