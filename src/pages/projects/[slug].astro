@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects } from '../../lib/github.ts';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const [projects, entries] = await Promise.all([getProjects(), getCollection('projects')]);
+  return entries.flatMap((entry) => {
+    const project = projects.find((p) => p.slug === entry.id);
+    return project ? [{ params: { slug: entry.id }, props: { entry, project } }] : [];
+  });
+}
+
+const { entry, project } = Astro.props;
+const { Content } = await render(entry);
+const title = entry.data.title ?? project.name;
+---
+
+<BaseLayout
+  title={title}
+  description={project.description || `Details about ${project.name}.`}
+  pagefindBody
+  breadcrumbs={[{ name: 'Projects', path: '/projects/' }, { name: title, path: `/projects/${entry.id}/` }]}
+>
+  <h1 class="mb-6 text-3xl font-bold">{title}</h1>
+  <div class="mb-8"><ProjectCard project={project} level={2} /></div>
+  <div class="prose max-w-none"><Content /></div>
+</BaseLayout>

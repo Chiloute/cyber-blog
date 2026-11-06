@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects } from '../../lib/github.ts';
+import { getCollection } from 'astro:content';
+
+const projects = await getProjects();
+const detailed = new Set((await getCollection('projects')).map((e) => e.id));
+---
+
+<BaseLayout title="Projects" description="Featured open-source projects." breadcrumbs={[{ name: 'Projects', path: '/projects/' }]}>
+  <h1 class="mb-6 text-3xl font-bold">Projects</h1>
+  <ul class="grid list-none gap-4 p-0 sm:grid-cols-2">
+    {projects.map((p) => <li><ProjectCard project={p} hasDetails={detailed.has(p.slug)} /></li>)}
+  </ul>
+</BaseLayout>

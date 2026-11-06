@@ -1,0 +1,46 @@
+---
+import ExternalLink from './ExternalLink.astro';
+import { formatDate } from '../lib/dates.ts';
+import type { Project } from '../lib/github.ts';
+
+interface Props {
+  project: Project;
+  /** Heading level, to match the page outline. */
+  level?: 2 | 3;
+  /** Whether an MDX enrichment page exists. */
+  hasDetails?: boolean;
+}
+const { project: p, level = 2, hasDetails = false } = Astro.props;
+const Heading = `h${level}` as 'h2' | 'h3';
+const full = `${p.owner}/${p.name}`;
+---
+
+<article class="flex h-full flex-col gap-3 rounded-lg border border-[var(--border)] p-4">
+  <Heading class="text-lg font-semibold">
+    <ExternalLink href={p.url} class="underline"><span class="sr-only">{full} on GitHub</span><span aria-hidden="true">{p.name}</span></ExternalLink>
+  </Heading>
+  {p.description && <p>{p.description}</p>}
+  {
+    p.languages.length > 0 && (
+      <ul aria-label="Languages" class="flex flex-wrap gap-2 text-sm">
+        {p.languages.map((l) => <li class="rounded border border-[var(--border)] px-2">{l}</li>)}
+      </ul>
+    )
+  }
+  <p class="flex flex-wrap gap-x-4 text-sm text-[var(--muted)]">
+    <span>
+      <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" width="14" height="14" class="inline" fill="currentColor"><path d="M8 1l2.1 4.3 4.7.7-3.4 3.3.8 4.7L8 11.8 3.8 14l.8-4.7L1.2 6l4.7-.7z"></path></svg>
+      {p.stars} {p.stars === 1 ? 'star' : 'stars'}
+    </span>
+    {p.updatedAt && <span>Updated <time datetime={p.updatedAt}>{formatDate(new Date(p.updatedAt))}</time></span>}
+    {p.license && <span>License: {p.license}</span>}
+  </p>
+  {
+    (p.homepage || hasDetails) && (
+      <p class="flex flex-wrap gap-x-4 text-sm">
+        {p.homepage && <ExternalLink href={p.homepage} class="underline">Demo of {p.name}</ExternalLink>}
+        {hasDetails && <a href={`/projects/${p.slug}/`} class="underline">Read more about {p.name}</a>}
+      </p>
+    )
+  }
+</article>
