@@ -1,0 +1,19 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** ISO date (YYYY-MM-DD). */
+  updated: string;
+}
+const { title, description, updated } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} pagefindBody={false}>
+  <article class="prose mx-auto max-w-3xl">
+    <h1>{title}</h1>
+    <p>Last updated: <time datetime={updated}>{updated}</time></p>
+    <slot />
+  </article>
+</BaseLayout>

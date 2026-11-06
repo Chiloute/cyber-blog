@@ -1,0 +1,40 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import ContactEmail from '../components/ContactEmail.astro';
+---
+
+<LegalLayout title="Accessibility statement" description="Accessibility target, status, testing methods and known limitations of this site." updated="2026-11-06">
+  <h2>Commitment and target</h2>
+  <p>This site aims to meet WCAG 2.2 level AA in both the light and the dark theme.</p>
+
+  <h2>Conformance status</h2>
+  <p>Partially conformant, pending a full audit. Testing is not complete yet, so full conformance is not claimed.</p>
+
+  <h2>Testing methods</h2>
+  <p>Automated: axe-core runs in CI on sample pages, in light and dark themes.</p>
+  <p>Manual checklist:</p>
+  <ul>
+    <li>Keyboard-only navigation</li>
+    <li>NVDA with Firefox</li>
+    <li>VoiceOver with Safari</li>
+    <li>200% zoom</li>
+    <li>Reflow at 320px width</li>
+    <li>Reduced motion preference</li>
+  </ul>
+
+  <h2>Known limitations</h2>
+  <ul>
+    <li>Third-party GitHub data (project descriptions, for example) may be missing or poorly described.</li>
+    <li>Syntax-highlighting contrast was verified only for the sampled languages.</li>
+    <li>Without JavaScript the site shows the light theme, and the theme selector, filters and copy buttons are unavailable. All content remains readable.</li>
+    <li>Flag reveal falls back to a native details element.</li>
+  </ul>
+
+  <h2>Feedback and contact</h2>
+  <p>
+    If you hit an accessibility barrier, write to <ContactEmail />. I aim to answer within 7 days.
+  </p>
+
+  <h2>Date</h2>
+  <p>This statement was written on <time datetime="2026-11-06">2026-11-06</time>.</p>
+</LegalLayout>

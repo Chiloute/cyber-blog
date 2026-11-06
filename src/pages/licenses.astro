@@ -1,0 +1,27 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { licenses } from '../config/site.ts';
+---
+
+<LegalLayout title="Licenses" description="Licenses of the blog content, the site source code and third-party components." updated="2026-11-06">
+  <h2>Blog content</h2>
+  <p>
+    Articles and other content are published under {licenses.content.name}. Read the
+    <ExternalLink href={`${licenses.content.url}legalcode`} newTab>full legal code of the license</ExternalLink>.
+    Reuse requires attribution, a non-commercial purpose, and sharing under the same license.
+  </p>
+
+  <h2>Site source code</h2>
+  <p>The source code of this site is released under the {licenses.code.name} license. The repository link will be added once it is public.</p>
+
+  <h2>Projects</h2>
+  <p>Projects presented on this site are governed by the license of their own repository.</p>
+
+  <h2>Third-party components</h2>
+  <ul>
+    <li>JetBrains Mono font: SIL Open Font License 1.1.</li>
+    <li>Shiki syntax-highlighting themes: MIT.</li>
+    <li>Other dependencies keep their respective open-source licenses.</li>
+  </ul>
+</LegalLayout>

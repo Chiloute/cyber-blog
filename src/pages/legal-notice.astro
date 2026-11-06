@@ -1,0 +1,36 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import ContactEmail from '../components/ContactEmail.astro';
+import { host, isHostPlaceholder } from '../config/hosting.ts';
+import { SITE_URL } from '../config/site.ts';
+
+const show = (v: string) => (isHostPlaceholder(v) ? 'To be completed' : v);
+---
+
+<LegalLayout title="Legal notice" description="Legal notice of chiloute.fr: publisher, host and contact." updated="2026-11-06">
+  <p>In accordance with Article 6 of French law no. 2004-575 (LCEN), here is the information about this website, {SITE_URL}.</p>
+
+  <h2>Publisher</h2>
+  <p>
+    This site is published by a non-professional individual under the pseudonym "chiloute". The publication director is chiloute.
+  </p>
+  <p>
+    As a non-professional publisher who wishes to remain anonymous, the identifying details of the publisher have been provided to the host, as allowed by Article 6 of the LCEN. They can be disclosed to the judicial authorities on request.
+  </p>
+
+  <h2>Contact</h2>
+  <p>Email: <ContactEmail /></p>
+
+  <h2>Host</h2>
+  <ul>
+    <li>Name: {show(host.name)}</li>
+    <li>Address: {show(host.address)}</li>
+    <li>Phone: {show(host.phone)}</li>
+    <li>Website: {show(host.website)}</li>
+  </ul>
+
+  <h2>Intellectual property</h2>
+  <p>
+    Content and source code are published under open licenses. See the <a href="/licenses">licenses page</a> for details and reuse conditions.
+  </p>
+</LegalLayout>

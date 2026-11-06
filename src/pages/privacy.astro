@@ -1,0 +1,41 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import ContactEmail from '../components/ContactEmail.astro';
+import { host, isHostPlaceholder } from '../config/hosting.ts';
+---
+
+<LegalLayout title="Privacy policy" description="What this site does and does not do with your data." updated="2026-11-06">
+  <p>Short version: this site collects no personal data.</p>
+
+  <h2>What is not used</h2>
+  <ul>
+    <li>No cookies.</li>
+    <li>No trackers and no analytics.</li>
+    <li>No personal data collected, no forms, no accounts.</li>
+    <li>No third-party requests: fonts are self-hosted and no CDN is used.</li>
+  </ul>
+
+  <h2>Local storage</h2>
+  <p>
+    The site stores one entry in your browser's localStorage: the key <code>theme</code>, with the value <code>light</code>, <code>dark</code> or <code>system</code>. It remembers your theme choice. It is never transmitted to any server.
+  </p>
+  <p>
+    To remove it, clear this site's data in your browser settings, or run <code>localStorage.removeItem('theme')</code> in the developer console.
+  </p>
+
+  <h2>Host logs</h2>
+  <p>
+    The host may process technical logs (IP address, user agent, timestamps) for security and operation purposes. This is outside the publisher's control; see the
+    {isHostPlaceholder(host.website) ? <>host's privacy policy (link to be completed)</> : <a href={host.website}>host's privacy policy</a>}.
+  </p>
+
+  <h2>Cookie banner</h2>
+  <p>
+    No consent banner is needed: the site sets no cookies and uses no tracking technology, and the only stored item (the theme preference) is strictly necessary to provide the display setting you asked for.
+  </p>
+
+  <h2>Your rights (GDPR)</h2>
+  <p>
+    Since no personal data is collected by the publisher, there is nothing to access or erase on this side. For any question or request regarding your rights under the GDPR, contact: <ContactEmail />.
+  </p>
+</LegalLayout>
