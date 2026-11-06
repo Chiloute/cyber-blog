@@ -10,17 +10,17 @@ const svg = (body, style = '') => `<svg xmlns="http://www.w3.org/2000/svg" viewB
 // Adaptive favicon: light background in light mode, dark in dark mode.
 writeFileSync('public/favicon.svg', svg(
   '<rect class="b" width="64" height="64" rx="12"/><path class="f" d="M14 20l14 12-14 12M34 46h18" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>',
-  '<style>.b{fill:#faf8f3}.f{stroke:#0b5a87}@media (prefers-color-scheme:dark){.b{fill:#0b0f14}.f{stroke:#5fd0a0}}</style>'));
+  '<style>.b{fill:#f7f6f3}.f{stroke:#b0121c}@media (prefers-color-scheme:dark){.b{fill:#0c0c0e}.f{stroke:#ff5a63}}</style>'));
 
 // Opaque dark variant, no rounding (platforms mask it).
-const solid = svg(glyph('#0b0f14', '#5fd0a0', 0));
+const solid = svg(glyph('#0c0c0e', '#ff5a63', 0));
 const png = (s, w) => new Resvg(s, { fitTo: { mode: 'width', value: w } }).render().asPng();
 writeFileSync('public/apple-touch-icon.png', png(solid, 180));
 writeFileSync('public/icon-192.png', png(solid, 192));
 writeFileSync('public/icon-512.png', png(solid, 512));
 
 // ICO = 6-byte header + 16-byte entry + embedded PNG.
-const p32 = png(svg(glyph('#0b0f14', '#5fd0a0', 12)), 32);
+const p32 = png(svg(glyph('#0c0c0e', '#ff5a63', 12)), 32);
 const h = Buffer.alloc(22);
 h.writeUInt16LE(1, 2); h.writeUInt16LE(1, 4);       // type icon, 1 image
 h[6] = 32; h[7] = 32;                               // width, height

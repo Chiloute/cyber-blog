@@ -3,8 +3,8 @@ import { join } from 'node:path';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 
-// Dark tokens from global.css. Contrast on #0b0f14: text 13.1:1, accent 10.4:1, muted 7.0:1 (all >= 4.5).
-const C = { bg: '#0b0f14', text: '#d6dee6', muted: '#94a1ae', accent: '#5fd0a0', border: '#243040' };
+// Dark tokens from global.css (checked by scripts/check-contrast.mjs: all >= 4.5:1 on bg).
+const C = { bg: '#0c0c0e', text: '#e8e6e3', muted: '#9e9da5', accent: '#ff5a63', border: '#27272c' };
 
 const dir = join(process.cwd(), 'node_modules/@fontsource/jetbrains-mono/files');
 const font = (w: 400 | 700) => readFileSync(join(dir, `jetbrains-mono-latin-${w}-normal.woff`));
