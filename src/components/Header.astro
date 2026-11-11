@@ -21,9 +21,11 @@ const section = links.find(([, href]) => active(href))?.[1].slice(0, -1) ?? '';
     <a href="/" class="target-min mr-auto font-mono text-[0.9375rem] font-bold text-text no-underline">
       <Prompt section={section} /><span class="sr-only">, home</span>
     </a>
-    <MobileNav controls="main-nav-list" />
-    <nav aria-label="Main" class="order-last w-full md:order-none md:w-auto">
-      <ul id="main-nav-list" class="m-0 flex list-none flex-col gap-1 p-0 font-mono text-sm max-md:data-collapsed:hidden md:flex-row md:gap-1">
+    <MobileNav controls="site-menu" />
+    <!-- Collapsed below md once mobile-nav.ts runs (data-collapsed); always visible without JS and on desktop. -->
+    <div id="site-menu" class="order-last flex w-full flex-col gap-3 max-md:data-collapsed:hidden md:order-none md:w-auto md:flex-row md:items-center md:gap-6">
+    <nav aria-label="Main">
+      <ul class="m-0 flex list-none flex-col gap-1 p-0 font-mono text-sm md:flex-row md:gap-1">
         {
           links.map(([label, href]) => (
             <li>
@@ -40,5 +42,6 @@ const section = links.find(([, href]) => active(href))?.[1].slice(0, -1) ?? '';
       </ul>
     </nav>
     <ThemeToggle />
+    </div>
   </div>
 </header>

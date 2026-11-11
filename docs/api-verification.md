@@ -28,7 +28,7 @@ Paths are relative to `node_modules/`. Verified by reading the installed `.d.ts`
 7. The empty content folders make the glob loader warn "base directory does not exist"; harmless until content exists.
 8. `astro.config.mjs` imports `.ts` files (`src/config/site.ts`, `src/lib/warn-config.ts`); works because Astro loads the config through Vite.
 9. Sitemap filter excludes `/404` and `/search` only; add other utility pages when they exist.
-10. `npm audit` reports 2 moderate issues (`postcss-selector-parser` via `@tailwindcss/typography`); the only fix offered is a downgrade, so left as is.
+10. `npm audit`: `postcss-selector-parser@6.0.10` (pinned by `@tailwindcss/typography`) fixed with a scoped `overrides` entry in `package.json`; moderate advisories on `fflate` (satori) and `minimatch` (eslint) remain, build/lint time only, no non-breaking fix.
 
 ## Shiki vs CSP resolution (T1b)
 

@@ -213,7 +213,7 @@ Same body rules as writeups. Example: `src/content/notes/linux-privesc-cheatshee
 
 ## Adding a project
 
-1. Add an entry to `projects` in `src/data/projects.json` (display order = file order): `repo` (`owner/name`), `description`, `homepage`, `stars`, `languages`, `updatedAt`, `license`. The file is edited by hand: the production build runs offline, so nothing is fetched from GitHub.
+1. Add an entry to `projects` in `src/data/projects.json` (display order = file order): `repo` (`owner/name`), `description`, `homepage`, `languages`, `license`. The file is edited by hand: the production build runs offline, so nothing is fetched from GitHub.
 2. Optional: enrich the project page with `src/content/projects/<repo-name>.mdx` (file name = repository name; the build warns when no project matches). Frontmatter:
 
 | Field | Type | Required |

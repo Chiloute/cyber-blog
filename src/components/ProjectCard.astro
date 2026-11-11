@@ -1,13 +1,12 @@
 ---
 import ExternalLink from './ExternalLink.astro';
-import { formatDate } from '../lib/dates.ts';
 import type { Project } from '../lib/projects.ts';
 
 interface Props {
   project: Project;
   /** Heading level, to match the page outline. */
   level?: 2 | 3;
-  /** Whether an MDX enrichment page exists. */
+  /** Whether an MDX page exists under /projects/: the title then links there, GitHub becomes secondary. */
   hasDetails?: boolean;
   /** Dense variant for the home page. */
   compact?: boolean;
@@ -15,19 +14,16 @@ interface Props {
 const { project: p, level = 2, hasDetails = false, compact = false } = Astro.props;
 const Heading = `h${level}` as 'h2' | 'h3';
 const full = `${p.owner}/${p.name}`;
-const stars = new Intl.NumberFormat('en-US').format(p.stars);
+// With a details page the title link stretches over the whole card (same pattern as PostCard); secondary links sit above it.
+const title = 'text-text no-underline group-hover:text-accent group-hover:underline';
 ---
 
-<article class:list={['flex h-full flex-col gap-3 rounded-lg border border-border bg-bg hover:border-border-ui', compact ? 'p-4' : 'p-5']}>
-  <div class="flex items-start justify-between gap-3">
-    <Heading class="m-0 font-mono text-base font-bold">
-      <ExternalLink href={p.url} class="text-text no-underline hover:text-accent hover:underline"><span class="sr-only">{full} on GitHub</span><span aria-hidden="true"><span class="font-normal text-muted">{p.owner}/</span>{p.name}</span></ExternalLink>
-    </Heading>
-    <span class="flex shrink-0 items-center gap-1 font-mono text-xs text-muted">
-      <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" width="12" height="12" fill="currentColor"><path d="M8 1l2.1 4.3 4.7.7-3.4 3.3.8 4.7L8 11.8 3.8 14l.8-4.7L1.2 6l4.7-.7z"></path></svg>
-      {stars} <span class="sr-only">{p.stars === 1 ? 'star' : 'stars'}</span>
-    </span>
-  </div>
+<article class:list={['group relative flex h-full flex-col gap-3 rounded-lg border border-border bg-bg', hasDetails ? 'hover:border-accent' : 'hover:border-border-ui', compact ? 'p-4' : 'p-5']}>
+  <Heading class="m-0 font-mono text-base font-bold">
+    {hasDetails
+      ? <a href={`/projects/${p.slug}/`} class:list={[title, 'after:absolute after:inset-0']}><span class="font-normal text-muted">{p.owner}/</span>{p.name}</a>
+      : <ExternalLink href={p.url} newTab class={title}><span class="sr-only">{full} on GitHub</span><span aria-hidden="true"><span class="font-normal text-muted">{p.owner}/</span>{p.name}</span></ExternalLink>}
+  </Heading>
   {p.description && <p class="m-0 text-[0.9375rem] text-muted">{p.description}</p>}
   <div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted">
     {p.languages.length > 0 && (
@@ -35,14 +31,13 @@ const stars = new Intl.NumberFormat('en-US').format(p.stars);
         {p.languages.map((l, i) => <li class:list={[i === 0 && 'text-text']}>{l}</li>)}
       </ul>
     )}
-    {!compact && p.updatedAt && <span>Updated <time datetime={p.updatedAt}>{formatDate(new Date(p.updatedAt))}</time></span>}
     {p.license && <span>License: {p.license}</span>}
   </div>
   {
-    !compact && (p.homepage || hasDetails) && (
-      <p class="m-0 flex flex-wrap gap-x-4 text-sm">
-        {p.homepage && <ExternalLink href={p.homepage}>Demo of {p.name}</ExternalLink>}
-        {hasDetails && <a href={`/projects/${p.slug}/`}>Read more about {p.name}</a>}
+    !compact && (hasDetails || p.homepage) && (
+      <p class="relative z-10 m-0 flex flex-wrap gap-x-4 text-sm">
+        {hasDetails && <ExternalLink href={p.url} newTab>{p.name} on GitHub</ExternalLink>}
+        {p.homepage && <ExternalLink href={p.homepage} newTab>Demo of {p.name}</ExternalLink>}
       </p>
     )
   }

@@ -81,7 +81,7 @@ The repository and the build use no secret. CI holds none either (see Supply cha
 ## Supply chain
 
 - `package-lock.json` is committed and used with `npm ci` in builds, so installed versions are reproducible.
-- `npm audit --audit-level=high` runs in `.github/workflows/security.yml` (lockfile changes and weekly). At the time of writing it reports 2 moderate issues, both through `@tailwindcss/typography` → `postcss-selector-parser`. The only fix offered is a downgrade, so they are accepted and tracked in `docs/api-verification.md`.
+- `npm audit --audit-level=high` runs in `.github/workflows/security.yml` (lockfile changes and weekly). `@tailwindcss/typography` pins `postcss-selector-parser@6.0.10` (advisory GHSA-rj75-hqrm-r3gf); a scoped `overrides` entry in `package.json` lifts it to a fixed 6.1.x. The remaining moderate advisories (`fflate` via `satori`, `minimatch` via `eslint`) only offer breaking downgrades and affect build or lint time, not the served site; they are accepted and re-checked weekly.
 - Dependabot updates npm and GitHub Actions weekly, with a 7-day cooldown on new versions.
 - GitHub Actions in CI are pinned to full commit SHAs, not tags. Workflows default to `permissions: {}` and `npm ci` runs with `--ignore-scripts`. CI holds no secrets: the production build is the offline `nix build`.
 

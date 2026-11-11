@@ -66,7 +66,7 @@ async function run(q: string, immediate: boolean) {
       const a = document.createElement('a');
       a.href = d.url;
       a.textContent = d.meta.title || d.url;
-      a.className = 'font-semibold';
+      a.className = 'font-semibold no-underline hover:underline';
       const h = document.createElement('h2');
       h.className = 'm-0 text-lg';
       h.append(a);

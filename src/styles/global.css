@@ -129,8 +129,11 @@
     font-size: 1.0625rem;
     text-rendering: optimizeLegibility;
   }
+  /* Underlined by default: color alone cannot mark a link in running text (WCAG 1.4.1).
+     Navigation, cards and buttons opt out with no-underline / .btn. */
   a {
     color: var(--accent);
+    text-decoration-line: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
   }
@@ -202,6 +205,7 @@
     color: var(--text);
     font-family: var(--font-mono);
     font-size: 0.8125rem;
+    text-decoration: none;
     cursor: pointer;
   }
   .btn:hover { border-color: var(--accent); color: var(--accent); }

@@ -2,6 +2,7 @@
 // MDX headings start at h2: the page <h1> is the title rendered here.
 import BaseLayout from './BaseLayout.astro';
 import Badge from '../components/Badge.astro';
+import PageHeader from '../components/PageHeader.astro';
 import Disclaimer from '../components/Disclaimer.astro';
 import TOC from '../components/TOC.astro';
 import PrevNext from '../components/PrevNext.astro';
@@ -50,10 +51,8 @@ const dd = 'm-0 text-[0.9375rem]';
   ]}
 >
   <article class:list={['grid gap-x-14', hasToc && 'xl:grid-cols-[minmax(0,1fr)_15rem]']}>
-    <header class="max-w-[68ch] xl:col-span-2">
-      <p class="kicker m-0"><a href={`/${section}/`} class="text-muted hover:text-accent">~/{section}</a><span aria-hidden="true">/{p.id}</span></p>
-      <h1 class="mt-3 text-[2rem] leading-tight font-semibold tracking-tight sm:text-[2.5rem]">{p.title}</h1>
-      <p class="mt-4 text-lg text-muted">{p.description}</p>
+    <PageHeader title={p.title} lead={p.description} class="xl:col-span-2">
+      <p slot="kicker" class="kicker m-0"><a href={`/${section}/`} class="text-muted no-underline hover:text-accent hover:underline">~/{section}</a><span aria-hidden="true">/{p.id}</span></p>
       <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-border py-5 sm:grid-cols-3 md:grid-cols-4">
         {w && <div><dt class={dt}>CTF</dt><dd class={dd}>{w.ctf}</dd></div>}
         {w && <div><dt class={dt}>Category</dt><dd class={dd}><Badge kind="category" value={w.category} /></dd></div>}
@@ -74,7 +73,7 @@ const dd = 'm-0 text-[0.9375rem]';
         </ul>
       )}
       {p.kind === 'writeup' && <Disclaimer />}
-    </header>
+    </PageHeader>
     {hasToc && (
       <aside class="xl:col-start-2 xl:row-start-2">
         <div class="xl:sticky xl:top-6"><TOC headings={p.headings} /></div>

@@ -1,7 +1,7 @@
 // Single source of truth for site-wide constants.
 
 export const AUTHOR = 'chiloute';
-export const SITE_DESCRIPTION = 'CTF writeups, security notes and small projects.';
+export const SITE_DESCRIPTION = 'Security notes, CTF writeups and the small tools built along the way.';
 export const SITE_URL = 'https://chiloute.fr';
 
 export const EMAIL_PLACEHOLDER = 'TODO@example.invalid';
@@ -53,8 +53,12 @@ export const securityTxt = {
   pgpKeyPath: '/pgp-key.txt',
 } as const;
 
+// Dark tokens needed outside CSS (OG images). Must equal [data-theme="dark"] in global.css:
+// src/lib/theme-tokens.test.ts checks it.
+export const darkTokens = { bg: '#0c0c0e', text: '#e8e6e3', muted: '#9e9da5', accent: '#ff5a63', border: '#27272c' } as const;
+
 // Browser UI color per theme (= --bg in global.css); theme-toggle.ts syncs the meta at runtime.
 export const themeColors = {
   light: '#f7f6f3',
-  dark: '#0c0c0e',
+  dark: darkTokens.bg,
 } as const;

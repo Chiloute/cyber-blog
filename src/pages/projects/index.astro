@@ -2,15 +2,13 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import { projects } from '../../lib/projects.ts';
-import { isPublishable, showDrafts } from '../../lib/publishable.ts';
-import { getCollection } from 'astro:content';
+import { projects, detailedProjects } from '../../lib/projects.ts';
 
-const detailed = new Set((await getCollection('projects', (e) => isPublishable(e.data, showDrafts()))).map((e) => e.id));
+const detailed = await detailedProjects();
 ---
 
 <BaseLayout title="Projects" description="Featured open-source projects." breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Projects', path: '/projects/' }]}>
-  <PageHeader kicker="$ ls ~/projects" title="Projects" lead="Open-source tools and experiments, pulled from GitHub at build time." />
+  <PageHeader kicker="$ ls ~/projects" title="Projects" lead="Open-source tools and experiments, mine or ones I contribute to." />
   <ul class="mt-8 grid list-none gap-4 p-0 sm:grid-cols-2">
     {projects.map((p) => <li><ProjectCard project={p} hasDetails={detailed.has(p.slug)} /></li>)}
   </ul>

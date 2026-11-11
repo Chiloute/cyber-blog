@@ -1,4 +1,5 @@
 import data from '../data/projects.json' with { type: 'json' };
+import { isPublishable, showDrafts } from './publishable.ts';
 
 export interface Project {
   owner: string;
@@ -7,9 +8,7 @@ export interface Project {
   description: string;
   url: string;
   homepage: string | null;
-  stars: number;
   languages: string[];
-  updatedAt: string | null;
   license: string | null;
 }
 
@@ -21,7 +20,13 @@ export const projects: Project[] = (data.projects as Entry[]).map(({ repo, ...p 
   const [owner = '', name = ''] = repo.split('/');
   return {
     owner, name, slug: name, url: `https://github.com/${repo}`,
-    description: p.description ?? '', homepage: p.homepage ?? null, stars: p.stars ?? 0,
-    languages: p.languages ?? [], updatedAt: p.updatedAt ?? null, license: p.license ?? null,
+    description: p.description ?? '', homepage: p.homepage ?? null,
+    languages: p.languages ?? [], license: p.license ?? null,
   };
 });
+
+/** Slugs of projects that have a publishable MDX page under /projects/. */
+export async function detailedProjects(): Promise<Set<string>> {
+  const { getCollection } = await import('astro:content');
+  return new Set((await getCollection('projects', (e) => isPublishable(e.data, showDrafts()))).map((e) => e.id));
+}

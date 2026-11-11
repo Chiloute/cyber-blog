@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { projects } from '../../lib/projects.ts';
 import { isPublishable, showDrafts } from '../../lib/publishable.ts';
@@ -16,18 +16,24 @@ export async function getStaticPaths() {
   });
 }
 
-const { entry, project } = Astro.props;
+const { entry, project: p } = Astro.props;
 const { Content } = await render(entry);
-const title = entry.data.title ?? project.name;
+const title = entry.data.title ?? p.name;
 ---
 
 <BaseLayout
   title={title}
-  description={project.description || `Details about ${project.name}.`}
+  description={p.description || `Details about ${p.name}.`}
   pagefindBody
   breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Projects', path: '/projects/' }, { name: title, path: `/projects/${entry.id}/` }]}
 >
-  <PageHeader kicker={`~/projects/${entry.id}`} title={title} />
-  <div class="my-8 max-w-xl"><ProjectCard project={project} level={2} /></div>
-  <div class="prose"><Content /></div>
+  <PageHeader kicker={`~/projects/${entry.id}`} title={title} {...(p.description ? { lead: p.description } : {})}>
+    <p class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-sm text-muted">
+      {p.languages.length > 0 && <span>{p.languages.join(' · ')}</span>}
+      {p.license && <span>License: {p.license}</span>}
+      <ExternalLink href={p.url} newTab>{p.owner}/{p.name} on GitHub</ExternalLink>
+      {p.homepage && <ExternalLink href={p.homepage} newTab>Demo</ExternalLink>}
+    </p>
+  </PageHeader>
+  <div class="prose mt-8"><Content /></div>
 </BaseLayout>

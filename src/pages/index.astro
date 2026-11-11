@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPublished } from '../lib/publishable.ts';
-import { projects as allProjects } from '../lib/projects.ts';
+import { projects as allProjects, detailedProjects } from '../lib/projects.ts';
+import { SITE_DESCRIPTION } from '../config/site.ts';
 import { readingMinutes } from '../lib/reading-time.ts';
 import { formatDate } from '../lib/dates.ts';
 
@@ -12,6 +13,7 @@ const allNotes = await getPublished('notes');
 const writeups = allWriteups.slice(0, 5);
 const notes = allNotes.slice(0, 3);
 const projects = allProjects.slice(0, 3);
+const detailed = await detailedProjects();
 const categories = [...new Set(allWriteups.map((e) => e.data.category))];
 const last = [...allWriteups, ...allNotes].map((e) => e.data.updated ?? e.data.date).sort((a, b) => b.getTime() - a.getTime())[0];
 const facts: [string, string][] = [
@@ -22,12 +24,12 @@ const facts: [string, string][] = [
 ];
 const more = 'font-mono text-sm text-accent no-underline hover:underline';
 ---
-<BaseLayout title="chiloute" description="Security notes, CTF writeups and projects.">
+<BaseLayout title="chiloute" description={SITE_DESCRIPTION}>
   <section aria-labelledby="h-intro" class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
     <div>
       <p class="kicker m-0" aria-hidden="true">$ whoami</p>
       <h1 id="h-intro" class="mt-3 text-5xl font-semibold tracking-tight sm:text-6xl">chiloute<span aria-hidden="true" class="text-accent">_</span></h1>
-      <p class="mt-5 max-w-[34ch] text-2xl leading-snug text-text">Security notes, CTF writeups and the small tools built along the way.</p>
+      <p class="mt-5 max-w-[34ch] text-2xl leading-snug text-text">{SITE_DESCRIPTION}</p>
       <p class="mt-5 max-w-[60ch] text-muted">
         {/* TODO: personalise the intro */}
         Each writeup is meant to be reproduced: the commands, the dead ends and the reasoning, not only the flag.
@@ -101,7 +103,7 @@ const more = 'font-mono text-sm text-accent no-underline hover:underline';
       </div>
       {projects.length === 0 ? <p class="mt-4 text-muted">No projects to show yet.</p> : (
         <ul class="mt-5 grid list-none gap-3 p-0">
-          {projects.map((p) => <li><ProjectCard project={p} level={3} compact /></li>)}
+          {projects.map((p) => <li><ProjectCard project={p} level={3} compact hasDetails={detailed.has(p.slug)} /></li>)}
         </ul>
       )}
     </section>
