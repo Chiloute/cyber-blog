@@ -2,6 +2,7 @@
 // One log-style row: date | title + description | category, difficulty, ctf.
 import Badge from './Badge.astro';
 import { isoDate } from '../lib/dates.ts';
+import { tagUrl } from '../lib/urls.ts';
 interface Props {
   href: string; title: string; description: string; date: Date; readingMinutes: number;
   category?: string | undefined; difficulty?: string | undefined; ctf?: string | undefined; tags?: string[];
@@ -21,7 +22,7 @@ const Heading = `h${level}` as 'h2' | 'h3';
       <p class="m-0 mt-1 text-[0.9375rem] text-muted">{description}</p>
       {tags.length > 0 && (
         <ul aria-label="Tags" class="relative z-10 m-0 mt-2 flex list-none flex-wrap gap-x-3 p-0 font-mono text-xs">
-          {tags.map((t) => <li><a href={`/writeups/tags/${encodeURIComponent(t)}/`} class="target-min text-muted no-underline hover:text-accent hover:underline">#{t}</a></li>)}
+          {tags.map((t) => <li><a href={tagUrl(t)} class="target-min text-muted no-underline hover:text-accent hover:underline">#{t}</a></li>)}
         </ul>
       )}
     </div>

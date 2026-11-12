@@ -1,4 +1,5 @@
 ---
+import { DIFFICULTIES } from '../config/taxonomy.ts';
 interface Props { kind: 'category' | 'difficulty'; value: string }
 const { kind, value } = Astro.props;
 // Full class strings so Tailwind can see them. Text is always visible; color is supplementary.
@@ -8,7 +9,7 @@ const colors: Record<string, string> = {
   easy: 'text-diff-easy', medium: 'text-diff-medium', hard: 'text-diff-hard', insane: 'text-diff-insane',
 };
 // Difficulty as a 4-step meter (decorative) next to its name.
-const level = ['easy', 'medium', 'hard', 'insane'].indexOf(value) + 1;
+const level = (DIFFICULTIES as readonly string[]).indexOf(value) + 1;
 ---
 {kind === 'category' ? (
   <span class:list={['font-mono text-[0.8125rem] whitespace-nowrap', colors[value]]}>

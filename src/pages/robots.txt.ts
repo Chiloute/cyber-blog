@@ -1,8 +1,7 @@
 import type { APIRoute } from 'astro';
-import { SITE_URL } from '../config/site.ts';
 
 export const GET: APIRoute = ({ site }) => {
-  const base = site ?? new URL(SITE_URL);
+  const base = site!;
   const body = [
     'User-agent: *',
     'Allow: /',

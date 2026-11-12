@@ -83,13 +83,13 @@ Playwright needs a browser: `npx playwright install chromium`. Set `PW_CHROMIUM_
 
 ```
 src/
-  config/        site.ts, projects.ts, hosting.ts
+  config/        site.ts, taxonomy.ts, hosting.ts
   content/       writeups/, notes/, projects/ (MDX)
   content.config.ts   collection schemas
   components/    Astro components; mdx/ holds Callout, Flag, Terminal, Spoiler
   layouts/       BaseLayout, PostLayout, LegalLayout
   pages/         routes, RSS, OG images, robots.txt, .well-known/security.txt
-  lib/           publishable, projects, feeds, jsonld, dates, warn-config, ...
+  lib/           publishable, projects, urls, feeds, jsonld, dates, warn-config, ...
   integrations/  shiki-css.mjs
   scripts/       client scripts (theme, filters, search, copy, flag, ...)
   data/          projects.json (featured projects)
@@ -159,11 +159,7 @@ From `src/content.config.ts`:
 
 - Start headings at `h2` (`##`); the page title is the `h1`.
 - Images need alt text (`alt=""` only for purely decorative ones).
-- Import the components at the top of the file, after the frontmatter:
-
-```mdx
-import { Callout, Flag, Terminal, Spoiler } from '../../components/mdx';
-```
+- `Callout`, `Flag`, `Terminal` and `Spoiler` are available in writeups and notes without any import (the pages pass them to `<Content />`).
 
 Components (`src/components/mdx/`):
 
@@ -214,7 +210,7 @@ Same body rules as writeups. Example: `src/content/notes/linux-privesc-cheatshee
 ## Adding a project
 
 1. Add an entry to `projects` in `src/data/projects.json` (display order = file order): `repo` (`owner/name`), `description`, `homepage`, `languages`, `license`. The file is edited by hand: the production build runs offline, so nothing is fetched from GitHub.
-2. Optional: enrich the project page with `src/content/projects/<repo-name>.mdx` (file name = repository name; the build warns when no project matches). Frontmatter:
+2. Optional: enrich the project page with `src/content/projects/<repo-name>.mdx` (file name = repository name; the build fails when no project matches). Frontmatter:
 
 | Field | Type | Required |
 |---|---|---|

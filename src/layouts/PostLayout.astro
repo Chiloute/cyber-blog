@@ -6,8 +6,8 @@ import PageHeader from '../components/PageHeader.astro';
 import Disclaimer from '../components/Disclaimer.astro';
 import TOC from '../components/TOC.astro';
 import PrevNext from '../components/PrevNext.astro';
-import { SITE_URL } from '../config/site.ts';
 import { formatDate, isoDate } from '../lib/dates.ts';
+import { ogPath, postUrl, tagUrl } from '../lib/urls.ts';
 
 export interface PostLayoutProps {
   kind: 'writeup' | 'note';
@@ -26,9 +26,9 @@ export interface PostLayoutProps {
   writeup?: { ctf: string; category: string; difficulty: string; points?: number | undefined; team?: string | undefined } | undefined;
 }
 const p = Astro.props as PostLayoutProps;
-const section = p.kind === 'writeup' ? 'writeups' : 'notes';
-const base = Astro.site ?? new URL(SITE_URL);
-const ogImage = new URL(`/og/${section}/${p.id}.png`, base).href;
+const section = p.kind === 'writeup' ? 'writeups' : 'notes'; // same value as the PostCollection type
+const base = Astro.site!;
+const ogImage = new URL(ogPath(section, p.id), base).href;
 const w = p.writeup;
 const hasToc = p.headings.filter((h) => h.depth === 2 || h.depth === 3).length >= 2;
 const dt = 'kicker';
@@ -47,7 +47,7 @@ const dd = 'm-0 text-[0.9375rem]';
   breadcrumbs={[
     { name: 'Home', path: '/' },
     { name: p.kind === 'writeup' ? 'Writeups' : 'Notes', path: `/${section}/` },
-    { name: p.title, path: `/${section}/${p.id}/` },
+    { name: p.title, path: postUrl(section, p.id) },
   ]}
 >
   <article class:list={['grid gap-x-14', hasToc && 'xl:grid-cols-[minmax(0,1fr)_15rem]']}>
@@ -67,7 +67,7 @@ const dd = 'm-0 text-[0.9375rem]';
         <ul aria-label="Tags" class="m-0 mt-4 flex list-none flex-wrap gap-2 p-0 font-mono text-xs">
           {p.tags.map((t) => (
             <li>{p.kind === 'writeup'
-              ? <a href={`/writeups/tags/${encodeURIComponent(t)}/`} class="target-min rounded border border-border px-2 text-muted no-underline hover:border-accent hover:text-accent">#{t}</a>
+              ? <a href={tagUrl(t)} class="target-min rounded border border-border px-2 text-muted no-underline hover:border-accent hover:text-accent">#{t}</a>
               : <span class="inline-flex rounded border border-border px-2 text-muted">#{t}</span>}</li>
           ))}
         </ul>

@@ -39,6 +39,5 @@ function upgrade(root: HTMLElement) {
 function init() {
   document.querySelectorAll<HTMLElement>('[data-flag]').forEach(upgrade);
 }
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-else init();
+init(); // module scripts are deferred: the DOM is already parsed
 export {};

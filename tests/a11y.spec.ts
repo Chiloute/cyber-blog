@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 const PAGES = [
   '/', '/writeups/', '/writeups/example-web-ssti/', '/writeups/tags/ssti/', '/notes/',
-  '/notes/linux-privesc-cheatsheet/', '/projects/', '/about/', '/uses/', '/search/', '/legal-notice/',
+  '/notes/linux-privesc-cheatsheet/', '/projects/', '/projects/jwt-tui/', '/about/', '/uses/', '/search/', '/legal-notice/',
   '/privacy/', '/accessibility/', '/disclaimer/', '/licenses/',
   '/does-not-exist/', // astro preview serves 404.html with status 404 for unknown URLs
 ];

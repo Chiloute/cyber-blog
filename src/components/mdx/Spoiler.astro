@@ -5,6 +5,6 @@ interface Props {
 const { title = 'Spoiler' } = Astro.props;
 ---
 <details class="not-prose group my-7 rounded-lg border border-dashed border-border-ui px-5 py-3 open:border-solid open:bg-surface">
-  <summary class="target-min cursor-pointer gap-2 font-mono text-sm font-bold text-text marker:text-highlight hover:text-accent">{title}</summary>
+  <summary class="min-h-6 cursor-pointer font-mono text-sm font-bold text-text marker:text-highlight hover:text-accent">{title}</summary>
   <div class="mt-3 pb-1"><slot /></div>
 </details>

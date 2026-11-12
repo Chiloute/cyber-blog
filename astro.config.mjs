@@ -6,7 +6,7 @@ import { unified } from '@astrojs/markdown-remark';
 import rehypeExternalLinks from 'rehype-external-links';
 import { SITE_URL } from './src/config/site.ts';
 import { checkConfig } from './src/lib/warn-config.ts';
-import { shikiCss, shikiToClass } from './src/integrations/shiki-css.mjs';
+import { shikiCss, shikiToClass, SHIKI_THEMES } from './src/integrations/shiki-css.mjs';
 import { loadLastmods } from './src/lib/frontmatter-dates.mjs';
 
 const lastmods = loadLastmods();
@@ -44,7 +44,7 @@ export default defineConfig({
       rehypePlugins: [[rehypeExternalLinks, { rel: ['noopener', 'noreferrer'] }]],
     }),
     shikiConfig: {
-      themes: { light: 'github-light-default', dark: 'github-dark-default' },
+      themes: SHIKI_THEMES,
       defaultColor: false,
       transformers: [shikiToClass],
     },

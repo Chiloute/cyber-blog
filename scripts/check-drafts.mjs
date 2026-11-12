@@ -1,13 +1,13 @@
 // Fails (exit 1) if any draft content leaks into dist/.
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
-import { join, basename } from 'node:path';
+import { join, sep } from 'node:path';
 
-const DIST = 'dist';
+const DIST = process.argv[2] ?? 'dist';
 const CANARIES = ['DRAFT-CANARY-91c2'];
 
 if (!existsSync(DIST)) {
-  console.error('check-drafts: dist/ is missing, run `npm run build` first');
+  console.error(`check-drafts: ${DIST}/ is missing, run \`npm run build\` first`);
   process.exit(1);
 }
 
@@ -20,18 +20,23 @@ function field(fm, key) {
 
 const needles = new Set(CANARIES);
 const blocked = [];
+const leaks = [];
 for (const dir of ['writeups', 'notes', 'projects']) {
   const base = join('src/content', dir);
   if (!existsSync(base)) continue;
-  for (const f of readdirSync(base).filter((n) => n.endsWith('.mdx'))) {
+  // Same discovery as the loaders: '**/*.mdx', slug = path relative to the collection dir, no extension.
+  for (const f of readdirSync(base, { recursive: true }).map(String).filter((n) => n.endsWith('.mdx'))) {
     const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(join(base, f), 'utf8'))?.[1] ?? '';
     if (field(fm, 'draft') === 'true') {
-      const slug = basename(f, '.mdx');
+      const slug = f.replace(/\.mdx$/, '').split(sep).join('/');
       const title = field(fm, 'title');
       blocked.push(`${dir}/${slug}`);
-      // A project slug is also its repo name, legitimately shown on the GitHub card: match its page URL instead.
-      needles.add(dir === 'projects' ? `/projects/${slug}/` : slug);
+      // Page URL, not the bare slug: short slugs would give false positives (a project slug is also its repo name).
+      needles.add(`/${dir}/${slug}/`);
       if (title) needles.add(title);
+      for (const p of [`${dir}/${slug}`, `og/${dir}/${slug}.png`]) {
+        if (existsSync(join(DIST, p))) leaks.push(`${join(DIST, p)}: exists`);
+      }
     }
   }
 }
@@ -44,7 +49,6 @@ function* walk(d) {
   }
 }
 
-const leaks = [];
 let files = 0;
 for (const p of walk(DIST)) {
   files++;

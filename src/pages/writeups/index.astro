@@ -4,14 +4,16 @@ import PostCard from '../../components/PostCard.astro';
 import Badge from '../../components/Badge.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { getPublished } from '../../lib/publishable.ts';
+import { DIFFICULTIES } from '../../config/taxonomy.ts';
+import { postUrl } from '../../lib/urls.ts';
 import { readingMinutes } from '../../lib/reading-time.ts';
 
 const entries = await getPublished('writeups');
+const order: readonly string[] = DIFFICULTIES;
 const uniq = (f: (e: (typeof entries)[number]) => string) => [...new Set(entries.map(f))].sort();
-const severity = ['easy', 'medium', 'hard', 'insane'];
 const filters = [
   { name: 'category', values: uniq((e) => e.data.category) },
-  { name: 'difficulty', values: uniq((e) => e.data.difficulty).sort((a, b) => severity.indexOf(a) - severity.indexOf(b)) },
+  { name: 'difficulty', values: uniq((e) => e.data.difficulty).sort((a, b) => order.indexOf(a) - order.indexOf(b)) },
   { name: 'ctf', values: uniq((e) => e.data.ctf) },
 ] as const;
 // Chip = native radio stretched over its label (same pattern as ThemeToggle); active state matches the header nav.
@@ -53,7 +55,7 @@ const radio = 'absolute inset-0 m-0 size-full cursor-pointer appearance-none opa
   <ul class="log mt-8 [form:not([hidden])+&]:mt-2" data-list>
     {entries.map((e) => (
       <PostCard
-        href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+        href={postUrl('writeups', e.id)} title={e.data.title} description={e.data.description} date={e.data.date}
         readingMinutes={readingMinutes(e.body ?? '')} category={e.data.category} difficulty={e.data.difficulty}
         ctf={e.data.ctf} tags={e.data.tags}
       />
