@@ -6,6 +6,7 @@ import { getPublished } from '../lib/publishable.ts';
 import { projects as allProjects, detailedProjects } from '../lib/projects.ts';
 import { SITE_DESCRIPTION } from '../config/site.ts';
 import { readingMinutes } from '../lib/reading-time.ts';
+import { postUrl } from '../lib/urls.ts';
 import { formatDate } from '../lib/dates.ts';
 
 const allWriteups = await getPublished('writeups');
@@ -61,7 +62,7 @@ const more = 'font-mono text-sm text-accent no-underline hover:underline';
       <ul class="log mt-5">
         {writeups.map((e) => (
           <PostCard
-            level={3} href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+            level={3} href={postUrl('writeups', e.id)} title={e.data.title} description={e.data.description} date={e.data.date}
             readingMinutes={readingMinutes(e.body ?? '')} category={e.data.category} difficulty={e.data.difficulty}
             ctf={e.data.ctf} tags={e.data.tags}
           />
@@ -84,7 +85,7 @@ const more = 'font-mono text-sm text-accent no-underline hover:underline';
           {notes.map((e) => (
             <li>
               <article class="group relative py-4">
-                <h3 class="m-0 text-base font-semibold"><a href={`/notes/${e.id}/`} class="text-text no-underline after:absolute after:inset-0 group-hover:text-accent group-hover:underline">{e.data.title}</a></h3>
+                <h3 class="m-0 text-base font-semibold"><a href={postUrl('notes', e.id)} class="text-text no-underline after:absolute after:inset-0 group-hover:text-accent group-hover:underline">{e.data.title}</a></h3>
                 <p class="m-0 mt-1 text-[0.9375rem] text-muted">{e.data.description}</p>
               </article>
             </li>

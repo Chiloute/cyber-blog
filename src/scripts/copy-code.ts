@@ -118,6 +118,5 @@ function init() {
   computeLabels(pres);
   pres.forEach(enhance);
 }
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-else init();
+init(); // module scripts are deferred: the DOM is already parsed
 export {};

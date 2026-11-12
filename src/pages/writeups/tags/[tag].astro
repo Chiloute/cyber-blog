@@ -3,6 +3,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
 import PageHeader from '../../../components/PageHeader.astro';
 import { getPublished } from '../../../lib/publishable.ts';
+import { postUrl, tagUrl } from '../../../lib/urls.ts';
 import { readingMinutes } from '../../../lib/reading-time.ts';
 
 export async function getStaticPaths() {
@@ -18,7 +19,7 @@ const { tag, entries } = Astro.props;
 <BaseLayout
   title={`Writeups tagged “${tag}”`}
   description={`CTF writeups tagged ${tag}.`}
-  breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Writeups', path: '/writeups/' }, { name: `Tag: ${tag}`, path: `/writeups/tags/${encodeURIComponent(tag)}/` }]}
+  breadcrumbs={[{ name: 'Home', path: '/' }, { name: 'Writeups', path: '/writeups/' }, { name: `Tag: ${tag}`, path: tagUrl(tag) }]}
 >
   <PageHeader kicker={`$ grep -l "#${tag}" ~/writeups`} title={`Writeups tagged “${tag}”`}>
     <p class="mt-3"><a href="/writeups/" class="font-mono text-sm"><span aria-hidden="true">← </span>All writeups</a></p>
@@ -26,7 +27,7 @@ const { tag, entries } = Astro.props;
   <ul class="log mt-8">
     {entries.map((e) => (
       <PostCard
-        href={`/writeups/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+        href={postUrl('writeups', e.id)} title={e.data.title} description={e.data.description} date={e.data.date}
         readingMinutes={readingMinutes(e.body ?? '')} category={e.data.category} difficulty={e.data.difficulty}
         ctf={e.data.ctf} tags={e.data.tags}
       />

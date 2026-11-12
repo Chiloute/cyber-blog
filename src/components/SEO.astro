@@ -1,5 +1,5 @@
 ---
-import { AUTHOR, SITE_URL, themeColors } from '../config/site.ts';
+import { AUTHOR, themeColors } from '../config/site.ts';
 import { blogPostingJsonLd, breadcrumbJsonLd, personJsonLd, serializeJsonLd } from '../lib/jsonld.ts';
 import type { JsonLd } from '../lib/jsonld.ts';
 
@@ -20,8 +20,6 @@ export interface SEOProps {
   tags?: string[];
   /** Emit robots noindex. */
   noindex?: boolean;
-  /** Extra JSON-LD objects, rendered in addition to the generated ones. */
-  jsonLd?: JsonLd | JsonLd[];
   /** Breadcrumb trail; paths are made absolute. */
   breadcrumbs?: { name: string; path: string }[];
 }
@@ -36,11 +34,10 @@ const {
   modifiedTime,
   tags = [],
   noindex = false,
-  jsonLd = [],
   breadcrumbs,
 } = Astro.props;
 
-const base = Astro.site ?? new URL(SITE_URL);
+const base = Astro.site!; // always set: `site` is in astro.config
 const pathname = Astro.url.pathname;
 const canonical = new URL(pathname, base).href; // trailing slash follows the actual route
 const isHome = pathname === '/';
@@ -60,7 +57,6 @@ if (type === 'article' && published) {
   );
 }
 if (breadcrumbs?.length) graph.push(breadcrumbJsonLd(breadcrumbs, base.href));
-graph.push(...(Array.isArray(jsonLd) ? jsonLd : [jsonLd]));
 // Not executed by browsers, so script-src does not apply. Astro's CSP hashing covers only
 // scripts it processes; this data block needs no hash (see NOTES).
 const json = serializeJsonLd(graph);

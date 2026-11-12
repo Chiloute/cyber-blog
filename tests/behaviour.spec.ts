@@ -102,3 +102,18 @@ test('back-to-top is hidden on desktop', async ({ page }) => {
   await page.goto('/writeups/example-web-ssti/');
   await expect(page.getByRole('link', { name: 'Back to top' })).toBeHidden();
 });
+
+test('static endpoints respond', async ({ request }) => {
+  for (const url of ['/rss.xml', '/writeups/rss.xml', '/notes/rss.xml']) {
+    const res = await request.get(url);
+    expect(res.status(), url).toBe(200);
+    expect(res.headers()['content-type'], url).toContain('xml');
+    expect(await res.text(), url).toContain('<rss');
+  }
+  const og = await request.get('/og/writeups/example-web-ssti.png');
+  expect(og.status()).toBe(200);
+  expect(og.headers()['content-type']).toContain('image/png');
+  expect([...(await og.body()).subarray(0, 4)]).toEqual([0x89, 0x50, 0x4e, 0x47]);
+  for (const url of ['/robots.txt', '/.well-known/security.txt']) expect((await request.get(url)).status(), url).toBe(200);
+  expect(await (await request.get('/sitemap-0.xml')).text()).not.toContain('/search/');
+});

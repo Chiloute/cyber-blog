@@ -6,6 +6,8 @@ import { transformerStyleToClass } from '@shikijs/transformers';
 export const SHIKI_CSS_PATH = '/shiki.css';
 
 // Converts Shiki inline styles to classes (CSP forbids style attributes).
+export const SHIKI_THEMES = { light: 'github-light-default', dark: 'github-dark-default' };
+
 export const shikiToClass = transformerStyleToClass({ classPrefix: 'sh-' });
 
 export const shikiCss = {

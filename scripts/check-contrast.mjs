@@ -1,5 +1,7 @@
 // WCAG 2.x contrast check. Parses tokens from src/styles/global.css. `--markdown` prints the docs table.
 import { readFileSync, existsSync } from 'node:fs';
+import { CATEGORIES, DIFFICULTIES } from '../src/config/taxonomy.ts';
+import { SHIKI_THEMES } from '../src/integrations/shiki-css.mjs';
 
 const css = readFileSync(new URL('../src/styles/global.css', import.meta.url), 'utf8');
 const block = (sel) => {
@@ -35,17 +37,17 @@ const pairs = [
   ['highlight / surface', 'highlight', 'surface', 4.5],
   ['text / highlight-bg (mark, selection)', 'text', 'highlight-bg', 4.5],
   ['accent (links) / code-bg', 'accent', 'code-bg', 4.5],
-  ...['web', 'crypto', 'pwn', 'reverse', 'forensic', 'osint', 'misc'].map((k) => [`badge cat-${k} / bg`, `cat-${k}`, 'bg', 4.5]),
-  ...['easy', 'medium', 'hard', 'insane'].map((k) => [`badge diff-${k} / bg`, `diff-${k}`, 'bg', 4.5]),
+  ...CATEGORIES.map((k) => [`badge cat-${k} / bg`, `cat-${k}`, 'bg', 4.5]),
+  ...DIFFICULTIES.map((k) => [`badge diff-${k} / bg`, `diff-${k}`, 'bg', 4.5]),
   ['text / code-bg', 'text', 'code-bg', 4.5],
   ['muted / code-bg', 'muted', 'code-bg', 4.5],
   ...['success', 'warning', 'info'].map((k) => [`callout ${k} / surface`, k, 'surface', 4.5]),
   ['callout text / surface', 'text', 'surface', 4.5],
-  ...['web', 'crypto', 'pwn', 'reverse', 'forensic', 'osint', 'misc'].map((k) => [`badge cat-${k} / surface`, `cat-${k}`, 'surface', 4.5]),
-  ...['easy', 'medium', 'hard', 'insane'].map((k) => [`badge diff-${k} / surface`, `diff-${k}`, 'surface', 4.5]),
+  ...CATEGORIES.map((k) => [`badge cat-${k} / surface`, `cat-${k}`, 'surface', 4.5]),
+  ...DIFFICULTIES.map((k) => [`badge diff-${k} / surface`, `diff-${k}`, 'surface', 4.5]),
   // Active state (header nav, writeup filter chips) sits on highlight-bg.
-  ...['web', 'crypto', 'pwn', 'reverse', 'forensic', 'osint', 'misc'].map((k) => [`badge cat-${k} / highlight-bg`, `cat-${k}`, 'highlight-bg', 4.5]),
-  ...['easy', 'medium', 'hard', 'insane'].map((k) => [`badge diff-${k} / highlight-bg`, `diff-${k}`, 'highlight-bg', 4.5]),
+  ...CATEGORIES.map((k) => [`badge cat-${k} / highlight-bg`, `cat-${k}`, 'highlight-bg', 4.5]),
+  ...DIFFICULTIES.map((k) => [`badge diff-${k} / highlight-bg`, `diff-${k}`, 'highlight-bg', 4.5]),
 ];
 
 const md = process.argv.includes('--markdown');
@@ -67,7 +69,7 @@ for (const [name, t] of Object.entries(themes)) {
 console.log(out.join('\n'));
 
 // Syntax highlighting. The painted bg is the Shiki one (global.css: .astro-code uses --shiki-*-bg).
-// Part 1 (no build): render samples with the themes read from astro.config.mjs. Part 2: dist/shiki.css if present.
+// Part 1 (no build): render samples with the themes from SHIKI_THEMES. Part 2: dist/shiki.css if present.
 if (!md) {
   const full = (h) => (h.length === 4 ? '#' + [...h.slice(1)].map((c) => c + c).join('') : h).toLowerCase();
   const check = (src, mode, bg, fg, text) => {
@@ -75,9 +77,6 @@ if (!md) {
     if (r < 4.5) { failed++; console.log(`FAIL  code ${src} ${mode}  ${fg} on ${bg}  ${r.toFixed(2)} (>= 4.5)  ${text ?? ''}`); }
     return r;
   };
-  const cfg = readFileSync(new URL('../astro.config.mjs', import.meta.url), 'utf8');
-  const named = cfg.match(/themes:\s*\{\s*light:\s*'([^']+)',\s*dark:\s*'([^']+)'/);
-  if (!named) throw new Error('shikiConfig themes not found in astro.config.mjs');
   const { codeToTokens } = await import('shiki');
   const samples = {
     ts: '// c\nconst a: number = 1; /* x */ function f<T>(x: T) { return `t${x}` + /re/g; }',
@@ -88,7 +87,7 @@ if (!md) {
     diff: '--- a\n+++ b\n@@ -1 +1 @@\n-a\n+b',
     yaml: '# c\na: &x\n  - b: "c"\n  - 1',
   };
-  for (const [mode, theme] of [['light', named[1]], ['dark', named[2]]]) {
+  for (const [mode, theme] of Object.entries(SHIKI_THEMES)) {
     let min = Infinity;
     for (const [lang, code] of Object.entries(samples)) {
       const { tokens, bg } = await codeToTokens(code, { lang, theme });

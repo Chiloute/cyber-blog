@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { CATEGORIES, DIFFICULTIES } from './config/taxonomy.ts';
 
 const writeups = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/writeups' }),
@@ -10,10 +11,10 @@ const writeups = defineCollection({
     ctf: z.string(),
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
-    category: z.enum(['web', 'pwn', 'crypto', 'forensic', 'reverse', 'misc', 'osint']),
-    difficulty: z.enum(['easy', 'medium', 'hard', 'insane']),
+    category: z.enum(CATEGORIES),
+    difficulty: z.enum(DIFFICULTIES),
     points: z.number().optional(),
-    tags: z.array(z.string()).default([]),
+    tags: z.array(z.string().regex(/^[a-z0-9][a-z0-9-]*$/, 'tags must be lowercase kebab-case')).default([]),
     team: z.string().optional(),
     draft: z.boolean().default(false),
   }),
@@ -26,7 +27,7 @@ const notes = defineCollection({
     description: z.string(),
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
-    tags: z.array(z.string()).default([]),
+    tags: z.array(z.string().regex(/^[a-z0-9][a-z0-9-]*$/, 'tags must be lowercase kebab-case')).default([]),
     draft: z.boolean().default(false),
   }),
 });

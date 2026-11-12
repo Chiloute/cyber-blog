@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { getPublished } from '../../lib/publishable.ts';
+import { postUrl } from '../../lib/urls.ts';
 import { readingMinutes } from '../../lib/reading-time.ts';
 
 const entries = await getPublished('notes');
@@ -16,7 +17,7 @@ const entries = await getPublished('notes');
   <ul class="log mt-8">
     {entries.map((e) => (
       <PostCard
-        href={`/notes/${e.id}/`} title={e.data.title} description={e.data.description} date={e.data.date}
+        href={postUrl('notes', e.id)} title={e.data.title} description={e.data.description} date={e.data.date}
         readingMinutes={readingMinutes(e.body ?? '')}
       />
     ))}

@@ -3,5 +3,5 @@ import Flag from './Flag.astro';
 import Terminal from './Terminal.astro';
 import Spoiler from './Spoiler.astro';
 
-// Usage in .mdx: import { Callout } from '../../components/mdx';
+// Passed to <Content components={...} /> by the post pages: MDX files use these tags without importing them.
 export { Callout, Flag, Terminal, Spoiler };
